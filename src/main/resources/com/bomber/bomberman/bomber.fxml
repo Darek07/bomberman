@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.bomber.bomberman.BomberView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane fx:controller="com.bomber.bomberman.Controller"
+            style="-fx-background-color: black;"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <BorderPane prefHeight="35" style="-fx-background-color: #0B5091; -fx-padding: 10px, 5px, 10px, 5px">
+            <left>
+                <Label fx:id="scoreLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+            </left>
+            <center>
+                <Label fx:id="gameOverLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+            </center>
+            <right>
+                <Label fx:id="levelLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+            </right>
+        </BorderPane>
+    </top>
+
+    <center>
+                <BomberView fx:id="bomberView" rowCount="16" columnCount="24" />
+    </center>
+
+    <bottom>
+        <HBox prefHeight="35" style="-fx-padding: 10px, 5px, 10px, 5px; -fx-background-color: #F3B61D">
+            <Label style="-fx-font-size: 140%; -fx-text-fill: white"
+                   text="Move: arrow keys / New game: R"/>
+        </HBox>
+    </bottom>
+</BorderPane>
