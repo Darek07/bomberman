@@ -2,13 +2,19 @@ package com.bomber.bomberman;
 
 import javafx.fxml.FXML;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import com.bomber.bomberman.BomberModel.Direction;
+import javafx.scene.shape.Rectangle;
 
-public class Controller {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class Controller implements Initializable {
 
     @FXML private Label scoreLabel;
     @FXML private Label levelLabel;
@@ -105,4 +111,96 @@ public class Controller {
     public static String getLevelFile(int x) {
         return levelFiles[x];
     }
+
+//    ----------vor-o-na-----------
+@FXML
+private SplitMenuButton choose_map;
+
+    @FXML
+    private Rectangle form1;
+
+    @FXML
+    private Rectangle form2;
+
+    @FXML
+    private Rectangle form3;
+
+    @FXML
+    private Rectangle form4;
+
+    @FXML
+    private Rectangle form_rounds;
+
+    @FXML
+    private Rectangle form_time;
+
+    @FXML
+    private ImageView image_map1;
+
+    @FXML
+    private ImageView image_map2;
+
+    @FXML
+    private ImageView image_map3;
+
+    @FXML
+    private MenuItem map1;
+
+    @FXML
+    private MenuItem map2;
+
+    @FXML
+    private MenuItem map3;
+
+    @FXML
+    private Button num1_button;
+
+    @FXML
+    private Button num2_button;
+
+    @FXML
+    private Button num3_button;
+
+    @FXML
+    private TextField player1_name;
+
+    @FXML
+    private TextField player2_name;
+
+    @FXML
+    private TextField player3_name;
+
+    @FXML
+    private TextField player4_name;
+
+    @FXML
+    private Slider sl_rounds;
+
+    @FXML
+    private Slider sl_time;
+
+    @FXML
+    private TextField text_rounds;
+
+    @FXML
+    private TextField text_time;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        sl_rounds.valueProperty().addListener((observable, oldValue, newValue) -> {
+
+            text_rounds.setText(Integer.toString(newValue.intValue()));
+
+
+        });
+        sl_time.valueProperty().addListener((observable, oldValue, newValue) -> {
+
+            text_time.setText(Double.toString(newValue.doubleValue()));
+
+
+        });
+
+    }
+//    --------end--vor-o-na--------
 }
