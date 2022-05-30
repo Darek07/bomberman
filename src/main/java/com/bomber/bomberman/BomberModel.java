@@ -6,13 +6,21 @@ import javafx.fxml.FXML;
 import java.io.*;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BomberModel {
     public enum CellValue {
         EMPTY, BREAKABLEWALL, UNBREAKABLEWALL, PLAYER
     }
     public enum Direction {
-        UP, DOWN, LEFT, RIGHT, NONE
+        UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0), NONE(0, 0);
+        final Point2D velocity;
+
+        Direction(int x, int y) {
+            this.velocity = new Point2D(x, y);
+        }
     }
 
     @FXML private int rowCount;
@@ -21,6 +29,7 @@ public class BomberModel {
     private int score;
     private static boolean gameOver;
     private static boolean youWon;
+    private List<Player> players = new ArrayList<>(3);
 
     public BomberModel() {
         this.startNewGame();
@@ -80,13 +89,38 @@ public class BomberModel {
         columnCount = 0;
         score = 0;
         initializeLevel(Controller.getLevelFile(0));
+        Collections.addAll(players, new Player(20, 9));
     }
 
     private class Player {
 
         private Point2D playerLocation;
-        private Point2D playerVelocity;
+        private Integer playerSpeed;
         private Direction playerDirection;
+        private boolean isMoving;
+        private ScheduledExecutorService executor;
+
+        public Player(int col, int row) {
+            this.playerLocation = new Point2D(col, row);
+            this.playerSpeed = 20;
+            this.playerDirection = Direction.NONE;
+            this.isMoving = false;
+            executor = Executors.newSingleThreadScheduledExecutor();
+            executor.scheduleAtFixedRate(() -> {
+                if (isMoving) {
+                    grid[(int)playerLocation.getY()][(int)playerLocation.getX()] = CellValue.EMPTY;
+                    System.out.println(grid[(int)playerLocation.getY()][(int)playerLocation.getX()]);
+                    this.playerLocation = this.playerLocation.add(playerDirection.velocity);
+                    grid[(int)playerLocation.getY()][(int)playerLocation.getX()] = CellValue.PLAYER;
+                    System.out.println(grid[(int)playerLocation.getY()][(int)playerLocation.getX()]);
+                }
+            }, 0, 1000 / playerSpeed, TimeUnit.MILLISECONDS);
+        }
+
+        public void setPlayerDirection(Direction playerDirection, boolean isMoving) {
+            this.playerDirection = playerDirection;
+            this.isMoving = isMoving;
+        }
 
         // todo player's moving
         public void move() {}
@@ -94,6 +128,9 @@ public class BomberModel {
 
     public void step() {}
 
+    public void setMoving(Direction direction, int player, boolean isMove) {
+        players.get(player).setPlayerDirection(direction, isMove);
+    }
 
     public static boolean isYouWon() {
         return youWon;

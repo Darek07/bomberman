@@ -16,7 +16,8 @@ public class Bomber extends Application {
         Parent root = loader.load();
         stage.setTitle("Bomberman");
         Controller controller = loader.getController();
-//        root.setOnKeyPressed(controller);
+        root.setOnKeyPressed(controller);
+        root.setOnKeyReleased(controller);
         double sceneWidth = controller.getBoardWidth() + 20.0;
         double sceneHeight = controller.getBoardHeight() + 100.0;
         stage.setScene(new Scene(root, sceneWidth, sceneHeight));
