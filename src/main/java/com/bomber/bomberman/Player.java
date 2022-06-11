@@ -2,9 +2,7 @@ package com.bomber.bomberman;
 
 import javafx.geometry.Point2D;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Player {
 	private Point2D playerLocation;
@@ -13,14 +11,15 @@ public class Player {
 	private boolean isMoving;
 	private ScheduledExecutorService executor;
 	private BomberModel model;
-	private boolean inBomb;
+	private boolean isInsideBomb;
+	private int fireDistance = 3;
 
 	public Player(int col, int row) {
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
 		this.playerSpeed = 10;
 		this.playerDirection = BomberModel.Direction.NONE;
 		this.isMoving = false;
-		this.inBomb = false;
+		this.isInsideBomb = false;
 //
 //		executor = Executors.newSingleThreadScheduledExecutor();
 //		executor.scheduleAtFixedRate(() -> {
@@ -40,16 +39,16 @@ public class Player {
 			int y = (int)newLocation.getY() / BomberView.CELL_SIZE;
 			int xr = ((int)newLocation.getX() + BomberView.PLAYER_SIZE) / BomberView.CELL_SIZE;
 			int yr = ((int)newLocation.getY() + BomberView.PLAYER_SIZE) / BomberView.CELL_SIZE;
-			if (inBomb) {
+			if (isInsideBomb) {
 				if (grid[y][x] != BomberModel.CellValue.BOMB && grid[yr][xr] != BomberModel.CellValue.BOMB
 						&& grid[y][xr] != BomberModel.CellValue.BOMB && grid[yr][x] != BomberModel.CellValue.BOMB) {
-					inBomb = false;
+					isInsideBomb = false;
 				}
 			}
-			if ((inBomb && grid[y][x] == BomberModel.CellValue.BOMB || grid[y][x] == BomberModel.CellValue.EMPTY || grid[y][x] == BomberModel.CellValue.FIRE)
-					&& (inBomb && grid[yr][xr] == BomberModel.CellValue.BOMB || grid[yr][xr] == BomberModel.CellValue.EMPTY || grid[yr][xr] == BomberModel.CellValue.FIRE)
-					&& (inBomb && grid[y][xr] == BomberModel.CellValue.BOMB || grid[y][xr] == BomberModel.CellValue.EMPTY || grid[y][xr] == BomberModel.CellValue.FIRE)
-					&& (inBomb && grid[yr][x] == BomberModel.CellValue.BOMB || grid[yr][x] == BomberModel.CellValue.EMPTY || grid[yr][x] == BomberModel.CellValue.FIRE)){
+			if ((isInsideBomb && grid[y][x] == BomberModel.CellValue.BOMB || grid[y][x] == BomberModel.CellValue.EMPTY || grid[y][x] == BomberModel.CellValue.FIRE)
+					&& (isInsideBomb && grid[yr][xr] == BomberModel.CellValue.BOMB || grid[yr][xr] == BomberModel.CellValue.EMPTY || grid[yr][xr] == BomberModel.CellValue.FIRE)
+					&& (isInsideBomb && grid[y][xr] == BomberModel.CellValue.BOMB || grid[y][xr] == BomberModel.CellValue.EMPTY || grid[y][xr] == BomberModel.CellValue.FIRE)
+					&& (isInsideBomb && grid[yr][x] == BomberModel.CellValue.BOMB || grid[yr][x] == BomberModel.CellValue.EMPTY || grid[yr][x] == BomberModel.CellValue.FIRE)){
 				this.playerLocation = newLocation;
 			}
 			else if (grid[y][x] == BomberModel.CellValue.RIP) {
@@ -58,11 +57,20 @@ public class Player {
 		}
 	}
 
-	public void setInBomb() {
-		inBomb = true;
+	public void setIsInsideBomb() {
+		isInsideBomb = true;
 	}
 
 	public Point2D getPlayerLocation() {
 		return playerLocation;
 	}
+
+	public int getFireDistance() {
+		return fireDistance;
+	}
+
+	public void setFireDistance(int fireDistance) {
+		this.fireDistance = fireDistance;
+	}
+
 }

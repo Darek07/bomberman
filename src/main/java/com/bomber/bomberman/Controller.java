@@ -97,7 +97,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         }
     }
 
-    public void fire() {
+    public void bombDetonated() {
         this.bomberView.update(bomberModel);
     }
 

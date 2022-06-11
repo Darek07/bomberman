@@ -91,93 +91,9 @@ public class BomberModel {
 
     public void step() {}
 
-    public void setBomb(int player, Controller controller) {
-        Point2D location = players.get(player).getPlayerLocation();
-        int row = (int)location.getY() / BomberView.CELL_SIZE;
-        int col = (int)location.getX() / BomberView.CELL_SIZE;
-        grid[row][col] = CellValue.BOMB;
-        players.get(player).setInBomb();
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-                this.fire(true, row, col);
-                isPlayerFired();
-                controller.fire();
-                Thread.sleep(1000);
-                this.fire(false, row, col);
-                controller.fire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    private boolean isPlayerFired() {
-        List<Player> fired = new ArrayList<>(3);
-        boolean ret = players.stream().anyMatch(player -> {
-            Point2D location = player.getPlayerLocation();
-            int row = (int)location.getY() / BomberView.CELL_SIZE;
-            int col = (int)location.getX() / BomberView.CELL_SIZE;
-            if (grid[row][col] == CellValue.FIRE) {
-                grid[row][col] = CellValue.RIP;
-                fired.add(player);
-                return true;
-            }
-            return false;
-        });
-        players.removeAll(fired);
-        return ret;
-    }
-
-    private void fire(boolean isFire, int row, int col) {
-        for (int i = 0; i < 3; i++) {
-            if (col + i >= columnCount || grid[row][col + i] == CellValue.UNBREAKABLEWALL) {
-                break;
-            }
-            if (grid[row][col + i] == CellValue.BREAKABLEWALL || grid[row][col + i] == CellValue.RIP) {
-                if (isFire) {
-                    grid[row][col + i] = CellValue.FIRE;
-                }
-                break;
-            }
-            grid[row][col + i] = isFire ? CellValue.FIRE : CellValue.EMPTY;
-        }
-        for (int i = 0; i < 3; i++) {
-            if (row + i >= rowCount || grid[row + i][col] == CellValue.UNBREAKABLEWALL) {
-                break;
-            }
-            if (grid[row + i][col] == CellValue.BREAKABLEWALL || grid[row + i][col] == CellValue.RIP) {
-                if (isFire) {
-                    grid[row + i][col] = CellValue.FIRE;
-                }
-                break;
-            }
-            grid[row + i][col] = isFire ? CellValue.FIRE : CellValue.EMPTY;
-        }
-        for (int i = 0; i > -3; i--) {
-            if (col + i < 0 || grid[row][col + i] == CellValue.UNBREAKABLEWALL) {
-                break;
-            }
-            if (grid[row][col + i] == CellValue.BREAKABLEWALL || grid[row][col + i] == CellValue.RIP) {
-                if (isFire) {
-                    grid[row][col + i] = CellValue.FIRE;
-                }
-                break;
-            }
-            grid[row][col + i] = isFire ? CellValue.FIRE : CellValue.EMPTY;
-        }
-        for (int i = 0; i > -3; i--) {
-            if (row + i < 0 || grid[row + i][col] == CellValue.UNBREAKABLEWALL) {
-                break;
-            }
-            if (grid[row + i][col] == CellValue.BREAKABLEWALL || grid[row + i][col] == CellValue.RIP) {
-                if (isFire) {
-                    grid[row + i][col] = CellValue.FIRE;
-                }
-                break;
-            }
-            grid[row + i][col] = isFire ? CellValue.FIRE : CellValue.EMPTY;
-        }
+    public void setBomb(int playerID, Controller controller) {
+        Player player = players.get(playerID);
+        new Bomb(this, player, controller);
     }
 
     public void setMoving(Direction direction, int player, boolean isMove) {
