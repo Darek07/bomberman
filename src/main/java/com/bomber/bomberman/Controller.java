@@ -6,8 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import com.bomber.bomberman.BomberModel.Direction;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,7 +48,6 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         this.bomberView.initializePlayersViews(bomberModel);
         this.update();
     }
-
 
     @Override
     public void handle(KeyEvent keyEvent) {

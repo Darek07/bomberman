@@ -75,7 +75,7 @@ public class Bomb extends Thread {
 			positions.forEach((key, position) -> {
 				int x = (int) position.getX();
 				int y = (int) position.getY();
-				if (y < 0 || x < 0 || y >= rowCount || x >= columnCount) {
+				if (y < 0 || x < 0 || y >= rowCount || x >= columnCount || grid[y][x] == CellValue.UNBREAKABLEWALL) {
 					toDelete.add(key);
 				}
 				else if (grid[y][x] == CellValue.BREAKABLEWALL) {

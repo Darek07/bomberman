@@ -8,17 +8,6 @@ import java.io.*;
 import java.util.*;
 
 public class BomberModel {
-    public enum CellValue {
-        EMPTY, BREAKABLEWALL, UNBREAKABLEWALL, BOMB, FIRE, RIP
-    }
-    public enum Direction {
-        UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0), NONE(0, 0);
-        final Point2D velocity;
-
-        Direction(int x, int y) {
-            this.velocity = new Point2D(x, y);
-        }
-    }
 
     @FXML private int rowCount;
     @FXML private int columnCount;
@@ -68,7 +57,7 @@ public class BomberModel {
                         break;
                     case 'P':
                         cell = CellValue.EMPTY;
-                        players.add(new Player(players.size(), column, row));
+                        players.add(new Player(this, players.size(), column, row));
                         break;
                     case '%':
                     default:
@@ -98,7 +87,8 @@ public class BomberModel {
 
     public void setMoving(Direction direction, int player, boolean isMove) {
         if (player >= players.size()) return;
-        players.get(player).setPlayerDirection(direction, isMove, grid);
+        players.get(player).setPlayerDirection(direction);
+        players.get(player).setMoving(isMove);
     }
 
     public static boolean isYouWon() {

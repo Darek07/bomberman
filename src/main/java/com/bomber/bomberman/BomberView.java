@@ -5,19 +5,18 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import com.bomber.bomberman.BomberModel.CellValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BomberView extends Group {
     public final static int CELL_SIZE = 40;
-    public final static int PLAYER_SIZE = 35;
+    public final static int PLAYER_SIZE = 27;
 
     @FXML private int rowCount;
     @FXML private int columnCount;
     private ImageView[][] cellViews;
-    private List<ImageView> playersViews = new ArrayList<>(3);
+    private final List<ImageView> playersViews = new ArrayList<>(3);
     private final Image unbreakableWallImage;
     private final Image breakableWallImage;
     private final Image playerImage;
