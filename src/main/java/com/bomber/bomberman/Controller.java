@@ -54,13 +54,14 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
     @Override
     public void handle(KeyEvent keyEvent) {
         boolean keyRecognized = true;
+        boolean bomb = false;
         KeyCode code = keyEvent.getCode();
         Direction direction = Direction.NONE;
         if (LEFTKEYS.stream().anyMatch(k -> k == code)) direction = Direction.LEFT;
         else if (RIGHTKEYS.stream().anyMatch(k -> k == code)) direction = Direction.RIGHT;
         else if (DOWNKEYS.stream().anyMatch(k -> k == code)) direction = Direction.DOWN;
         else if (UPKEYS.stream().anyMatch(k -> k == code)) direction = Direction.UP;
-        else if (BOMBKEYS.stream().anyMatch(k -> k == code)) direction = Direction.NONE;
+        else if (BOMBKEYS.stream().anyMatch(k -> k == code)) bomb = true;
 //        else if (code == KeyCode.R) {
 //            pause();
 //            bomberModel.startNewGame();
@@ -71,15 +72,20 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
 
         if (keyRecognized) {
             keyEvent.consume();
-            bomberModel.setCurrentDirection(direction);
-            bomberModel.setMoving(direction, getPlayerByKey(code), keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED));
+            if (bomb && keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                bomberModel.setBomb(getPlayerByKey(code), this);
+            }
+            else {
+                bomberModel.setMoving(direction, getPlayerByKey(code), keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED));
+            }
             update();
         }
     }
 
     private void update() {
-        this.bomberModel.step();
+        this.bomberView.updatePlayers(bomberModel);
         this.bomberView.update(bomberModel);
+        this.bomberModel.step();
         this.scoreLabel.setText(String.format("Score: %d", this.bomberModel.getScore()));
         this.levelLabel.setText(String.format("Level: %d", 0));
         if (bomberModel.isGameOver()) {
@@ -89,6 +95,10 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         if (bomberModel.isYouWon()) {
             this.gameOverLabel.setText(String.format("YOU WON!"));
         }
+    }
+
+    public void fire() {
+        this.bomberView.update(bomberModel);
     }
 
     public int getPlayerByKey(KeyCode key) {

@@ -6,13 +6,10 @@ import javafx.fxml.FXML;
 import java.io.*;
 
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class BomberModel {
     public enum CellValue {
-        EMPTY, BREAKABLEWALL, UNBREAKABLEWALL, PLAYER
+        EMPTY, BREAKABLEWALL, UNBREAKABLEWALL, BOMB, FIRE, RIP
     }
     public enum Direction {
         UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0), NONE(0, 0);
@@ -29,7 +26,7 @@ public class BomberModel {
     private int score;
     private static boolean gameOver;
     private static boolean youWon;
-    private List<Player> players = new ArrayList<>(3);
+    private final List<Player> players = new ArrayList<>(3);
 
     public BomberModel() {
         this.startNewGame();
@@ -70,7 +67,8 @@ public class BomberModel {
                         cell = CellValue.BREAKABLEWALL;
                         break;
                     case 'P':
-                        cell = CellValue.PLAYER;
+                        cell = CellValue.EMPTY;
+                        players.add(new Player(column, row));
                         break;
                     case '%':
                     default:
@@ -89,47 +87,102 @@ public class BomberModel {
         columnCount = 0;
         score = 0;
         initializeLevel(Controller.getLevelFile(0));
-        Collections.addAll(players, new Player(20, 9));
-    }
-
-    private class Player {
-
-        private Point2D playerLocation;
-        private Integer playerSpeed;
-        private Direction playerDirection;
-        private boolean isMoving;
-        private ScheduledExecutorService executor;
-
-        public Player(int col, int row) {
-            this.playerLocation = new Point2D(col, row);
-            this.playerSpeed = 20;
-            this.playerDirection = Direction.NONE;
-            this.isMoving = false;
-            executor = Executors.newSingleThreadScheduledExecutor();
-            executor.scheduleAtFixedRate(() -> {
-                if (isMoving) {
-                    grid[(int)playerLocation.getY()][(int)playerLocation.getX()] = CellValue.EMPTY;
-                    System.out.println(grid[(int)playerLocation.getY()][(int)playerLocation.getX()]);
-                    this.playerLocation = this.playerLocation.add(playerDirection.velocity);
-                    grid[(int)playerLocation.getY()][(int)playerLocation.getX()] = CellValue.PLAYER;
-                    System.out.println(grid[(int)playerLocation.getY()][(int)playerLocation.getX()]);
-                }
-            }, 0, 1000 / playerSpeed, TimeUnit.MILLISECONDS);
-        }
-
-        public void setPlayerDirection(Direction playerDirection, boolean isMoving) {
-            this.playerDirection = playerDirection;
-            this.isMoving = isMoving;
-        }
-
-        // todo player's moving
-        public void move() {}
     }
 
     public void step() {}
 
+    public void setBomb(int player, Controller controller) {
+        Point2D location = players.get(player).getPlayerLocation();
+        int row = (int)location.getY() / BomberView.CELL_SIZE;
+        int col = (int)location.getX() / BomberView.CELL_SIZE;
+        grid[row][col] = CellValue.BOMB;
+        players.get(player).setInBomb();
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                this.fire(true, row, col);
+                isPlayerFired();
+                controller.fire();
+                Thread.sleep(1000);
+                this.fire(false, row, col);
+                controller.fire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private boolean isPlayerFired() {
+        List<Player> fired = new ArrayList<>(3);
+        boolean ret = players.stream().anyMatch(player -> {
+            Point2D location = player.getPlayerLocation();
+            int row = (int)location.getY() / BomberView.CELL_SIZE;
+            int col = (int)location.getX() / BomberView.CELL_SIZE;
+            if (grid[row][col] == CellValue.FIRE) {
+                grid[row][col] = CellValue.RIP;
+                fired.add(player);
+                return true;
+            }
+            return false;
+        });
+        players.removeAll(fired);
+        return ret;
+    }
+
+    private void fire(boolean isFire, int row, int col) {
+        for (int i = 0; i < 3; i++) {
+            if (col + i >= columnCount || grid[row][col + i] == CellValue.UNBREAKABLEWALL) {
+                break;
+            }
+            if (grid[row][col + i] == CellValue.BREAKABLEWALL || grid[row][col + i] == CellValue.RIP) {
+                if (isFire) {
+                    grid[row][col + i] = CellValue.FIRE;
+                }
+                break;
+            }
+            grid[row][col + i] = isFire ? CellValue.FIRE : CellValue.EMPTY;
+        }
+        for (int i = 0; i < 3; i++) {
+            if (row + i >= rowCount || grid[row + i][col] == CellValue.UNBREAKABLEWALL) {
+                break;
+            }
+            if (grid[row + i][col] == CellValue.BREAKABLEWALL || grid[row + i][col] == CellValue.RIP) {
+                if (isFire) {
+                    grid[row + i][col] = CellValue.FIRE;
+                }
+                break;
+            }
+            grid[row + i][col] = isFire ? CellValue.FIRE : CellValue.EMPTY;
+        }
+        for (int i = 0; i > -3; i--) {
+            if (col + i < 0 || grid[row][col + i] == CellValue.UNBREAKABLEWALL) {
+                break;
+            }
+            if (grid[row][col + i] == CellValue.BREAKABLEWALL || grid[row][col + i] == CellValue.RIP) {
+                if (isFire) {
+                    grid[row][col + i] = CellValue.FIRE;
+                }
+                break;
+            }
+            grid[row][col + i] = isFire ? CellValue.FIRE : CellValue.EMPTY;
+        }
+        for (int i = 0; i > -3; i--) {
+            if (row + i < 0 || grid[row + i][col] == CellValue.UNBREAKABLEWALL) {
+                break;
+            }
+            if (grid[row + i][col] == CellValue.BREAKABLEWALL || grid[row + i][col] == CellValue.RIP) {
+                if (isFire) {
+                    grid[row + i][col] = CellValue.FIRE;
+                }
+                break;
+            }
+            grid[row + i][col] = isFire ? CellValue.FIRE : CellValue.EMPTY;
+        }
+    }
+
     public void setMoving(Direction direction, int player, boolean isMove) {
-        players.get(player).setPlayerDirection(direction, isMove);
+        if (player >= players.size()) return;
+        players.get(player).setPlayerDirection(direction, isMove, grid);
     }
 
     public static boolean isYouWon() {
@@ -153,8 +206,6 @@ public class BomberModel {
         return null;
     }
 
-    public void setCurrentDirection(Direction direction) {}
-
     public int getScore() {
         return score;
     }
@@ -169,6 +220,10 @@ public class BomberModel {
 
     public int getColumnCount() {
         return columnCount;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 
 }
