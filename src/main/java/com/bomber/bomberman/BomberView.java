@@ -32,7 +32,7 @@ public class BomberView extends Group {
         this.playerImage = new Image(getClass().getResourceAsStream(base + "player.gif"));
         this.bombImage = new Image(getClass().getResourceAsStream(base + "bomb.png"));
         this.fireImage = new Image(getClass().getResourceAsStream(base + "fire.png"));
-        this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.jpg"));
+        this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.png"));
     }
 
     private void initializeGrid() {
@@ -52,51 +52,51 @@ public class BomberView extends Group {
         }
     }
 
-    public void updatePlayers(BomberModel model) {
-        List<Player> players = model.getPlayers();
-        if (players.size() != playersViews.size()) {
-            playersViews.forEach(playerView -> playerView.setImage(null));
-            playersViews.clear();
-            players.forEach(player -> {
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(PLAYER_SIZE);
-                imageView.setFitHeight(PLAYER_SIZE);
-                imageView.setImage(this.playerImage);
-                playersViews.add(imageView);
-            });
-            this.getChildren().addAll(playersViews);
+    public void initializePlayersViews(BomberModel model) {
+        playersViews.forEach(playerView -> playerView.setImage(null));
+        playersViews.clear();
+        for (int i = 0; ; i++) {
+            Player player = model.getPlayerByID(i);
+            if (player == null) {
+                break;
+            }
+            ImageView imageView = new ImageView();
+            imageView.setFitWidth(PLAYER_SIZE);
+            imageView.setFitHeight(PLAYER_SIZE);
+            imageView.setImage(this.playerImage);
+            playersViews.add(imageView);
         }
-        for (int i = 0; i < players.size(); i++) {
-            Point2D location = players.get(i).getPlayerLocation();
+        this.getChildren().addAll(playersViews);
+    }
+
+    public void updatePlayersViews(BomberModel model) {
+        if (playersViews.size() == 0) {
+            initializePlayersViews(model);
+        }
+        for (int i = 0; i < playersViews.size(); i++) {
+            Player player = model.getPlayerByID(i);
+            if (player == null) {
+                playersViews.get(i).setImage(null);
+                continue;
+            }
+            Point2D location = player.getPlayerLocation();
             playersViews.get(i).setX(location.getX());
             playersViews.get(i).setY(location.getY());
         }
     }
 
-    public void update(BomberModel model) {
+    public void updateGridViews(BomberModel model) {
         assert model.getRowCount() == this.rowCount && model.getColumnCount() == this.columnCount;
         for (int row = 0; row < this.rowCount; row++){
             for (int column = 0; column < this.columnCount; column++){
                 CellValue value = model.getCellValue(row, column);
                 switch (value) {
-                    case BREAKABLEWALL:
-                        this.cellViews[row][column].setImage(this.breakableWallImage);
-                        break;
-                    case UNBREAKABLEWALL:
-                        this.cellViews[row][column].setImage(this.unbreakableWallImage);
-                        break;
-                    case BOMB:
-                        this.cellViews[row][column].setImage(this.bombImage);
-                        break;
-                    case FIRE:
-                        this.cellViews[row][column].setImage(this.fireImage);
-                        break;
-                    case RIP:
-                        this.cellViews[row][column].setImage(this.ripImage);
-                        break;
-                    default:
-                        this.cellViews[row][column].setImage(null);
-                        break;
+                    case BREAKABLEWALL -> this.cellViews[row][column].setImage(this.breakableWallImage);
+                    case UNBREAKABLEWALL -> this.cellViews[row][column].setImage(this.unbreakableWallImage);
+                    case BOMB -> this.cellViews[row][column].setImage(this.bombImage);
+                    case FIRE -> this.cellViews[row][column].setImage(this.fireImage);
+                    case RIP -> this.cellViews[row][column].setImage(this.ripImage);
+                    default -> this.cellViews[row][column].setImage(null);
                 }
             }
         }

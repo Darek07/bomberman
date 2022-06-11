@@ -5,6 +5,7 @@ import javafx.geometry.Point2D;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class Player {
+	private final int playerID;
 	private Point2D playerLocation;
 	private Integer playerSpeed;
 	private BomberModel.Direction playerDirection;
@@ -14,7 +15,8 @@ public class Player {
 	private boolean isInsideBomb;
 	private int fireDistance = 3;
 
-	public Player(int col, int row) {
+	public Player(int playerID, int col, int row) {
+		this.playerID = playerID;
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
 		this.playerSpeed = 10;
 		this.playerDirection = BomberModel.Direction.NONE;
@@ -71,6 +73,10 @@ public class Player {
 
 	public void setFireDistance(int fireDistance) {
 		this.fireDistance = fireDistance;
+	}
+
+	public int getPlayerID() {
+		return playerID;
 	}
 
 }

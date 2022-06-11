@@ -15,7 +15,7 @@ public class Bomb extends Thread {
 	private final BomberModel bomberModel;
 	private final Player player;
 	private final Controller controller;
-	private CellValue[][] grid;
+	private final CellValue[][] grid;
 	private Point2D location;
 	private int distance;
 

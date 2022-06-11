@@ -47,6 +47,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
 
     public void initialize() {
         this.bomberModel = new BomberModel();
+        this.bomberView.initializePlayersViews(bomberModel);
         this.update();
     }
 
@@ -83,8 +84,8 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
     }
 
     private void update() {
-        this.bomberView.updatePlayers(bomberModel);
-        this.bomberView.update(bomberModel);
+        this.bomberView.updatePlayersViews(bomberModel);
+        this.bomberView.updateGridViews(bomberModel);
         this.bomberModel.step();
         this.scoreLabel.setText(String.format("Score: %d", this.bomberModel.getScore()));
         this.levelLabel.setText(String.format("Level: %d", 0));
@@ -98,7 +99,8 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
     }
 
     public void bombDetonated() {
-        this.bomberView.update(bomberModel);
+        this.bomberView.updatePlayersViews(bomberModel);
+        this.bomberView.updateGridViews(bomberModel);
     }
 
     public int getPlayerByKey(KeyCode key) {

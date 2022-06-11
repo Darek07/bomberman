@@ -68,7 +68,7 @@ public class BomberModel {
                         break;
                     case 'P':
                         cell = CellValue.EMPTY;
-                        players.add(new Player(column, row));
+                        players.add(new Player(players.size(), column, row));
                         break;
                     case '%':
                     default:
@@ -140,6 +140,15 @@ public class BomberModel {
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public Player getPlayerByID(int playerID) {
+        for (Player player : players) {
+            if (player.getPlayerID() == playerID) {
+                return player;
+            }
+        }
+        return null;
     }
 
 }
