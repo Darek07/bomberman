@@ -1,20 +1,13 @@
 package com.bomber.bomberman;
 
-import javafx.geometry.Point2D;
-
 import javafx.fxml.FXML;
 import java.io.*;
 
 import java.util.*;
 
 public class BomberModel {
-    public enum CellValue {
-        EMPTY, BREAKABLEWALL, UNBREAKABLEWALL, PLAYER
-    }
-    public enum Direction {
-        UP, DOWN, LEFT, RIGHT, NONE
-    }
 
+    private final List<Player> players = new ArrayList<>(Controller.PLAYERS_NUMBER);
     @FXML private int rowCount;
     @FXML private int columnCount;
     private CellValue[][] grid;
@@ -26,7 +19,16 @@ public class BomberModel {
         this.startNewGame();
     }
 
-    public void initializeLevel(String mapFile) {
+    public void startNewGame() {
+        this.gameOver = false;
+        this.youWon = false;
+        rowCount = 0;
+        columnCount = 0;
+        score = 0;
+        initializeMap(Controller.getMapFile());
+    }
+
+    public void initializeMap(String mapFile) {
 
         File file = new File(mapFile);
         Scanner scanner = null;
@@ -50,50 +52,32 @@ public class BomberModel {
         }
         grid = new CellValue[rowCount][columnCount];
         for (int row = 0; scanner.hasNextLine(); row++){
-            String line= scanner.nextLine();
+            String line = scanner.nextLine();
             for (int column = 0; column < line.length(); column++){
                 CellValue cell;
                 switch (line.charAt(column)) {
-                    case '#':
-                        cell = CellValue.UNBREAKABLEWALL;
-                        break;
-                    case '&':
-                        cell = CellValue.BREAKABLEWALL;
-                        break;
-                    case 'P':
-                        cell = CellValue.PLAYER;
-                        break;
-                    case '%':
-                    default:
+                    case '#' -> cell = CellValue.UNBREAKABLEWALL;
+                    case '&' -> cell = CellValue.BREAKABLEWALL;
+                    case 'P' -> {
                         cell = CellValue.EMPTY;
-                        break;
+                        if (players.size() < Controller.PLAYERS_NUMBER) {
+                            players.add(new Player(this, players.size(), column, row));
+                        }
+                    }
+                    default -> cell = CellValue.EMPTY;
                 }
                 grid[row][column] = cell;
             }
         }
     }
 
-    public void startNewGame() {
-        this.gameOver = false;
-        this.youWon = false;
-        rowCount = 0;
-        columnCount = 0;
-        score = 0;
-        initializeLevel(Controller.getLevelFile(0));
+    public void setBomb(Player player) {
+        new Bomb(this, player);
     }
 
-    private class Player {
-
-        private Point2D playerLocation;
-        private Point2D playerVelocity;
-        private Direction playerDirection;
-
-        // todo player's moving
-        public void move() {}
+    public void setPlayerMove(Player player, Direction direction, boolean isMove) {
+        player.setPlayerDirectionAndMove(direction, isMove);
     }
-
-    public void step() {}
-
 
     public static boolean isYouWon() {
         return youWon;
@@ -103,20 +87,18 @@ public class BomberModel {
         return gameOver;
     }
 
-    public CellValue[][] getGrid() {
-        return grid;
-    }
-
     public CellValue getCellValue(int row, int column) {
-        assert row >= 0 && row < this.grid.length && column >= 0 && column < this.grid[0].length;
-        return this.grid[row][column];
+        return (row < 0 || column < 0 || row >= this.grid.length || column >= this.grid[0].length)
+                ? null
+                : this.grid[row][column];
     }
 
-    public static Direction getCurrentDirection() {
-        return null;
+    public void setCellValue(CellValue cellValue, int row, int column) {
+        if (row < 0 || column < 0 || row >= this.grid.length || column >= this.grid[0].length) {
+            return;
+        }
+        grid[row][column] = cellValue;
     }
-
-    public void setCurrentDirection(Direction direction) {}
 
     public int getScore() {
         return score;
@@ -134,4 +116,16 @@ public class BomberModel {
         return columnCount;
     }
 
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public Player getPlayerByID(int playerID) {
+        for (Player player : players) {
+            if (player.getPlayerID() == playerID) {
+                return player;
+            }
+        }
+        return null;
+    }
 }
