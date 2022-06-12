@@ -13,35 +13,48 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Controller extends Thread implements EventHandler<KeyEvent> {
+    public static final int PLAYERS_AMOUNT = 3;
 
     @FXML private Label scoreLabel;
     @FXML private Label levelLabel;
     @FXML private Label gameOverLabel;
     @FXML private BomberView bomberView;
     private BomberModel bomberModel;
+    private boolean paused;
 
-    private static final String[] levelFiles = { Controller.class.getResource("map.txt").getFile().substring(3) };
+    private static final String[] mapFiles = { Controller.class.getResource("map.txt").getFile().substring(3) };
     public static final KeyCode[] PLAYER0KEYS = { KeyCode.LEFT, KeyCode.RIGHT, KeyCode.DOWN, KeyCode.UP, KeyCode.SLASH };
     public static final KeyCode[] PLAYER1KEYS = { KeyCode.A, KeyCode.D, KeyCode.S, KeyCode.W, KeyCode.TAB };
     public static final KeyCode[] PLAYER2KEYS = { KeyCode.H, KeyCode.K, KeyCode.J, KeyCode.U, KeyCode.SPACE };
-    public static final Set<KeyCode> LEFTKEYS = new HashSet<>(3);
-    public static final Set<KeyCode> RIGHTKEYS = new HashSet<>(3);
-    public static final Set<KeyCode> DOWNKEYS = new HashSet<>(3);
-    public static final Set<KeyCode> UPKEYS = new HashSet<>(3);
-    public static final Set<KeyCode> BOMBKEYS = new HashSet<>(3);
+    public static final Set<KeyCode> LEFT_KEYS;
+    public static final Set<KeyCode> RIGHT_KEYS;
+    public static final Set<KeyCode> DOWN_KEYS;
+    public static final Set<KeyCode> UP_KEYS;
+    public static final Set<KeyCode> BOMB_KEYS;
 
     static {
-        Collections.addAll(LEFTKEYS, PLAYER0KEYS[0], PLAYER1KEYS[0], PLAYER2KEYS[0]);
-        Collections.addAll(RIGHTKEYS, PLAYER0KEYS[1], PLAYER1KEYS[1], PLAYER2KEYS[1]);
-        Collections.addAll(DOWNKEYS, PLAYER0KEYS[2], PLAYER1KEYS[2], PLAYER2KEYS[2]);
-        Collections.addAll(UPKEYS, PLAYER0KEYS[3], PLAYER1KEYS[3], PLAYER2KEYS[3]);
-        Collections.addAll(BOMBKEYS, PLAYER0KEYS[4], PLAYER1KEYS[4], PLAYER2KEYS[4]);
+        LEFT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        RIGHT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        DOWN_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        UP_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        BOMB_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        Collections.addAll(LEFT_KEYS, PLAYER0KEYS[0], PLAYER1KEYS[0], PLAYER2KEYS[0]);
+        Collections.addAll(RIGHT_KEYS, PLAYER0KEYS[1], PLAYER1KEYS[1], PLAYER2KEYS[1]);
+        Collections.addAll(DOWN_KEYS, PLAYER0KEYS[2], PLAYER1KEYS[2], PLAYER2KEYS[2]);
+        Collections.addAll(UP_KEYS, PLAYER0KEYS[3], PLAYER1KEYS[3], PLAYER2KEYS[3]);
+        Collections.addAll(BOMB_KEYS, PLAYER0KEYS[4], PLAYER1KEYS[4], PLAYER2KEYS[4]);
     }
-
-    private boolean paused;
 
     public Controller() {
         this.paused = false;
+    }
+
+    public void initialize() {
+        this.bomberModel = new BomberModel();
+        this.bomberView.setBomberModel(bomberModel);
+        this.bomberView.initializePlayersViews();
+        this.update();
+
         new AnimationTimer() {
             long lastTime = 0;
             @Override
@@ -59,23 +72,28 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         }.start();
     }
 
-    public void initialize() {
-        this.bomberModel = new BomberModel();
-        this.bomberView.initializePlayersViews(bomberModel);
-        this.update();
-    }
-
     @Override
     public void handle(KeyEvent keyEvent) {
         boolean keyRecognized = true;
         boolean bomb = false;
+        boolean isPressed = keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED);
         KeyCode code = keyEvent.getCode();
         Direction direction = Direction.NONE;
-        if (LEFTKEYS.stream().anyMatch(k -> k == code)) direction = Direction.LEFT;
-        else if (RIGHTKEYS.stream().anyMatch(k -> k == code)) direction = Direction.RIGHT;
-        else if (DOWNKEYS.stream().anyMatch(k -> k == code)) direction = Direction.DOWN;
-        else if (UPKEYS.stream().anyMatch(k -> k == code)) direction = Direction.UP;
-        else if (BOMBKEYS.stream().anyMatch(k -> k == code)) bomb = true;
+        if (LEFT_KEYS.stream().anyMatch(k -> k == code)) {
+            direction = Direction.LEFT;
+        }
+        else if (RIGHT_KEYS.stream().anyMatch(k -> k == code)) {
+            direction = Direction.RIGHT;
+        }
+        else if (DOWN_KEYS.stream().anyMatch(k -> k == code)) {
+            direction = Direction.DOWN;
+        }
+        else if (UP_KEYS.stream().anyMatch(k -> k == code)) {
+            direction = Direction.UP;
+        }
+        else if (BOMB_KEYS.stream().anyMatch(k -> k == code)) {
+            bomb = true;
+        }
 //        else if (code == KeyCode.R) {
 //            pause();
 //            bomberModel.startNewGame();
@@ -86,20 +104,23 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
 
         if (keyRecognized) {
             keyEvent.consume();
-            if (bomb && keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                bomberModel.setBomb(getPlayerByKey(code), this);
+            int playerID = getPlayerByKey(code);
+            Player player = bomberModel.getPlayerByID(playerID);
+            if (player == null) {
+                return;
+            }
+            if (bomb && isPressed) {
+                bomberModel.setBomb(player);
             }
             else {
-                bomberModel.setMoving(direction, getPlayerByKey(code), keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED));
+                bomberModel.setPlayerMove(player, direction, isPressed);
             }
-            update();
         }
     }
 
     private void update() {
-        this.bomberView.updatePlayersViews(bomberModel);
-        this.bomberView.updateGridViews(bomberModel);
-        this.bomberModel.step();
+        this.bomberView.updatePlayersViews();
+        this.bomberView.updateGridViews();
         this.scoreLabel.setText(String.format("Score: %d", this.bomberModel.getScore()));
         this.levelLabel.setText(String.format("Level: %d", 0));
         if (bomberModel.isGameOver()) {
@@ -109,11 +130,6 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         if (bomberModel.isYouWon()) {
             this.gameOverLabel.setText(String.format("YOU WON!"));
         }
-    }
-
-    public void bombDetonated() {
-        this.bomberView.updatePlayersViews(bomberModel);
-        this.bomberView.updateGridViews(bomberModel);
     }
 
     public int getPlayerByKey(KeyCode key) {
@@ -139,7 +155,10 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         return BomberView.CELL_SIZE * this.bomberView.getRowCount();
     }
 
-    public static String getLevelFile(int x) {
-        return levelFiles[x];
+    public static String getMapFile(int x) {
+        if (x < 0 || x >= mapFiles.length) {
+            return null;
+        }
+        return mapFiles[x];
     }
 }

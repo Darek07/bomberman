@@ -8,11 +8,11 @@ import static com.bomber.bomberman.BomberView.CELL_SIZE;
 
 public class Player extends AnimationTimer {
 	private final int playerID;
+	private final BomberModel model;
 	private Point2D playerLocation;
 	private Integer playerSpeed;
 	private Direction playerDirection;
 	private boolean isMoving;
-	private BomberModel model;
 	private boolean isInsideBomb;
 	private int fireDistance = 3;
 	private long lastUpdateTime = 0;
@@ -66,10 +66,9 @@ public class Player extends AnimationTimer {
 	}
 
 	private boolean isPointCollide(Point2D point) {
-		CellValue[][] grid = model.getGrid();
-		int x = (int)point.getX() / CELL_SIZE;
-		int y = (int)point.getY() / CELL_SIZE;
-		return switch (grid[y][x]) {
+		int col = (int)point.getX() / CELL_SIZE;
+		int row = (int)point.getY() / CELL_SIZE;
+		return switch (model.getCellValue(row, col)) {
 			case BOMB -> !isInsideBomb;
 			case UNBREAKABLEWALL, BREAKABLEWALL -> true;
 			case EMPTY, FIRE, RIP -> false;
@@ -87,6 +86,14 @@ public class Player extends AnimationTimer {
 				isPointCollide(playerLocation.add(PLAYER_SIZE, 0)) ||
 				isPointCollide(playerLocation.add(PLAYER_SIZE, PLAYER_SIZE)) ||
 				isPointCollide(playerLocation.add(0, PLAYER_SIZE));
+	}
+
+	public void setPlayerDirectionAndMove(Direction direction, boolean move) {
+		if (this.isMoving && !move && this.playerDirection != direction) {
+			return;
+		}
+		this.playerDirection = direction;
+		this.isMoving = move;
 	}
 
 	public void setIsInsideBomb() {
@@ -107,17 +114,5 @@ public class Player extends AnimationTimer {
 
 	public int getPlayerID() {
 		return playerID;
-	}
-
-	public boolean isMoving() {
-		return isMoving;
-	}
-
-	public void setPlayerDirectionAndMove(Direction direction, boolean move) {
-		if (this.isMoving && !move && this.playerDirection != direction) {
-			return;
-		}
-		this.playerDirection = direction;
-		this.isMoving = move;
 	}
 }

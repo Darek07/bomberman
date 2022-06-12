@@ -7,19 +7,28 @@ import java.util.*;
 
 public class BomberModel {
 
+    private final List<Player> players = new ArrayList<>(Controller.PLAYERS_AMOUNT);
     @FXML private int rowCount;
     @FXML private int columnCount;
     private CellValue[][] grid;
     private int score;
     private static boolean gameOver;
     private static boolean youWon;
-    private final List<Player> players = new ArrayList<>(3);
 
     public BomberModel() {
         this.startNewGame();
     }
 
-    public void initializeLevel(String mapFile) {
+    public void startNewGame() {
+        this.gameOver = false;
+        this.youWon = false;
+        rowCount = 0;
+        columnCount = 0;
+        score = 0;
+        initializeMap(Controller.getMapFile(0));
+    }
+
+    public void initializeMap(String mapFile) {
 
         File file = new File(mapFile);
         Scanner scanner = null;
@@ -43,49 +52,31 @@ public class BomberModel {
         }
         grid = new CellValue[rowCount][columnCount];
         for (int row = 0; scanner.hasNextLine(); row++){
-            String line= scanner.nextLine();
+            String line = scanner.nextLine();
             for (int column = 0; column < line.length(); column++){
                 CellValue cell;
                 switch (line.charAt(column)) {
-                    case '#':
-                        cell = CellValue.UNBREAKABLEWALL;
-                        break;
-                    case '&':
-                        cell = CellValue.BREAKABLEWALL;
-                        break;
-                    case 'P':
+                    case '#' -> cell = CellValue.UNBREAKABLEWALL;
+                    case '&' -> cell = CellValue.BREAKABLEWALL;
+                    case 'P' -> {
                         cell = CellValue.EMPTY;
-                        players.add(new Player(this, players.size(), column, row));
-                        break;
-                    case '%':
-                    default:
-                        cell = CellValue.EMPTY;
-                        break;
+                        if (players.size() < Controller.PLAYERS_AMOUNT) {
+                            players.add(new Player(this, players.size(), column, row));
+                        }
+                    }
+                    default -> cell = CellValue.EMPTY;
                 }
                 grid[row][column] = cell;
             }
         }
     }
 
-    public void startNewGame() {
-        this.gameOver = false;
-        this.youWon = false;
-        rowCount = 0;
-        columnCount = 0;
-        score = 0;
-        initializeLevel(Controller.getLevelFile(0));
+    public void setBomb(Player player) {
+        new Bomb(this, player);
     }
 
-    public void step() {}
-
-    public void setBomb(int playerID, Controller controller) {
-        Player player = players.get(playerID);
-        new Bomb(this, player, controller);
-    }
-
-    public void setMoving(Direction direction, int player, boolean isMove) {
-        if (player >= players.size()) return;
-        players.get(player).setPlayerDirectionAndMove(direction, isMove);
+    public void setPlayerMove(Player player, Direction direction, boolean isMove) {
+        player.setPlayerDirectionAndMove(direction, isMove);
     }
 
     public static boolean isYouWon() {
@@ -96,17 +87,17 @@ public class BomberModel {
         return gameOver;
     }
 
-    public CellValue[][] getGrid() {
-        return grid;
-    }
-
     public CellValue getCellValue(int row, int column) {
-        assert row >= 0 && row < this.grid.length && column >= 0 && column < this.grid[0].length;
-        return this.grid[row][column];
+        return (row < 0 || column < 0 || row >= this.grid.length || column >= this.grid[0].length)
+                ? null
+                : this.grid[row][column];
     }
 
-    public static Direction getCurrentDirection() {
-        return null;
+    public void setCellValue(CellValue cellValue, int row, int column) {
+        if (row < 0 || column < 0 || row >= this.grid.length || column >= this.grid[0].length) {
+            return;
+        }
+        grid[row][column] = cellValue;
     }
 
     public int getScore() {
@@ -137,5 +128,4 @@ public class BomberModel {
         }
         return null;
     }
-
 }
