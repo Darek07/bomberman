@@ -3,7 +3,8 @@ package com.bomber.bomberman;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -12,8 +13,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Controller extends Thread implements EventHandler<KeyEvent> {
-    public static final int PLAYERS_AMOUNT = 3;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class Controller extends Thread implements EventHandler<KeyEvent>, Initializable {
+    public static int PLAYERS_NUMBER = 3;
+    private static String mapFile;
+    private static int roundsNumber;
+    private static long roundTimeMs;
+    private static final String[] playersNames = new String[PLAYERS_NUMBER];
 
     @FXML private Label scoreLabel;
     @FXML private Label levelLabel;
@@ -33,11 +41,11 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
     public static final Set<KeyCode> BOMB_KEYS;
 
     static {
-        LEFT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        RIGHT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        DOWN_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        UP_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        BOMB_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        LEFT_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        RIGHT_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        DOWN_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        UP_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        BOMB_KEYS = new HashSet<>(PLAYERS_NUMBER);
         Collections.addAll(LEFT_KEYS, PLAYER0KEYS[0], PLAYER1KEYS[0], PLAYER2KEYS[0]);
         Collections.addAll(RIGHT_KEYS, PLAYER0KEYS[1], PLAYER1KEYS[1], PLAYER2KEYS[1]);
         Collections.addAll(DOWN_KEYS, PLAYER0KEYS[2], PLAYER1KEYS[2], PLAYER2KEYS[2]);
@@ -49,11 +57,11 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         this.paused = false;
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
         this.bomberModel = new BomberModel();
         this.bomberView.setBomberModel(bomberModel);
         this.bomberView.initializePlayersViews();
-        this.update();
 
         new AnimationTimer() {
             long lastTime = 0;
@@ -155,10 +163,38 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
         return BomberView.CELL_SIZE * this.bomberView.getRowCount();
     }
 
-    public static String getMapFile(int x) {
+    public static String getMapFile() {
+        return mapFile;
+    }
+
+    public static void setMapFile(int x) {
         if (x < 0 || x >= mapFiles.length) {
+            throw new NullPointerException();
+        }
+        mapFile = mapFiles[x];
+    }
+
+    public static void setPlayersNumber(int playersAmount) {
+        Controller.PLAYERS_NUMBER = playersAmount;
+    }
+
+    public static void setRoundsNumber(int roundsNumber) {
+        Controller.roundsNumber = roundsNumber;
+    }
+
+    public static void setRoundTimeMs(long roundTimeMs) {
+        Controller.roundTimeMs = roundTimeMs;
+    }
+
+    public static String getPlayerName(int x) {
+        if (x < 0 || x >= playersNames.length) {
             return null;
         }
-        return mapFiles[x];
+        return playersNames[x];
     }
+
+    public static void setPlayerName(String playerName, int x) {
+        Controller.playersNames[x] = playerName;
+    }
+
 }

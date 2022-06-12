@@ -7,7 +7,7 @@ import java.util.*;
 
 public class BomberModel {
 
-    private final List<Player> players = new ArrayList<>(Controller.PLAYERS_AMOUNT);
+    private final List<Player> players = new ArrayList<>(Controller.PLAYERS_NUMBER);
     @FXML private int rowCount;
     @FXML private int columnCount;
     private CellValue[][] grid;
@@ -25,7 +25,7 @@ public class BomberModel {
         rowCount = 0;
         columnCount = 0;
         score = 0;
-        initializeMap(Controller.getMapFile(0));
+        initializeMap(Controller.getMapFile());
     }
 
     public void initializeMap(String mapFile) {
@@ -60,7 +60,7 @@ public class BomberModel {
                     case '&' -> cell = CellValue.BREAKABLEWALL;
                     case 'P' -> {
                         cell = CellValue.EMPTY;
-                        if (players.size() < Controller.PLAYERS_AMOUNT) {
+                        if (players.size() < Controller.PLAYERS_NUMBER) {
                             players.add(new Player(this, players.size(), column, row));
                         }
                     }

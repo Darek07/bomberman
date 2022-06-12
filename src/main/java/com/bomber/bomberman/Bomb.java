@@ -7,8 +7,8 @@ import java.util.*;
 public class Bomb extends Thread {
 
 	private final Set<Point2D> firePositions = new HashSet<>(9);
-	private final List<Player> hitPlayers = new ArrayList<>(Controller.PLAYERS_AMOUNT);
-	private final List<Point2D> ripPositions = new ArrayList<>(Controller.PLAYERS_AMOUNT);
+	private final List<Player> hitPlayers = new ArrayList<>(Controller.PLAYERS_NUMBER);
+	private final List<Point2D> ripPositions = new ArrayList<>(Controller.PLAYERS_NUMBER);
 	private final BomberModel bomberModel;
 	private final Player player;
 	private Point2D location;
