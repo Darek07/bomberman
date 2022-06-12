@@ -5,10 +5,8 @@ import javafx.fxml.FXML;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.shape.Rectangle;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +17,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller extends Thread implements EventHandler<KeyEvent>, Initializable {
-    public static final int PLAYERS_AMOUNT = 3;
+    public static int PLAYERS_NUMBER = 3;
+    private static String mapFile;
+    private static int roundsNumber;
+    private static long roundTimeMs;
+    private static final String[] playersNames = new String[PLAYERS_NUMBER];
 
     @FXML private Label scoreLabel;
     @FXML private Label levelLabel;
@@ -39,11 +41,11 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
     public static final Set<KeyCode> BOMB_KEYS;
 
     static {
-        LEFT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        RIGHT_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        DOWN_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        UP_KEYS = new HashSet<>(PLAYERS_AMOUNT);
-        BOMB_KEYS = new HashSet<>(PLAYERS_AMOUNT);
+        LEFT_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        RIGHT_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        DOWN_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        UP_KEYS = new HashSet<>(PLAYERS_NUMBER);
+        BOMB_KEYS = new HashSet<>(PLAYERS_NUMBER);
         Collections.addAll(LEFT_KEYS, PLAYER0KEYS[0], PLAYER1KEYS[0], PLAYER2KEYS[0]);
         Collections.addAll(RIGHT_KEYS, PLAYER0KEYS[1], PLAYER1KEYS[1], PLAYER2KEYS[1]);
         Collections.addAll(DOWN_KEYS, PLAYER0KEYS[2], PLAYER1KEYS[2], PLAYER2KEYS[2]);
@@ -55,11 +57,11 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         this.paused = false;
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
         this.bomberModel = new BomberModel();
         this.bomberView.setBomberModel(bomberModel);
         this.bomberView.initializePlayersViews();
-        this.update();
 
         new AnimationTimer() {
             long lastTime = 0;
@@ -161,102 +163,38 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         return BomberView.CELL_SIZE * this.bomberView.getRowCount();
     }
 
-    public static String getMapFile(int x) {
+    public static String getMapFile() {
+        return mapFile;
+    }
+
+    public static void setMapFile(int x) {
         if (x < 0 || x >= mapFiles.length) {
+            throw new NullPointerException();
+        }
+        mapFile = mapFiles[x];
+    }
+
+    public static void setPlayersNumber(int playersAmount) {
+        Controller.PLAYERS_NUMBER = playersAmount;
+    }
+
+    public static void setRoundsNumber(int roundsNumber) {
+        Controller.roundsNumber = roundsNumber;
+    }
+
+    public static void setRoundTimeMs(long roundTimeMs) {
+        Controller.roundTimeMs = roundTimeMs;
+    }
+
+    public static String getPlayerName(int x) {
+        if (x < 0 || x >= playersNames.length) {
             return null;
         }
-        return mapFiles[x];
+        return playersNames[x];
     }
 
-//    ----------vor-o-na-----------
-@FXML
-private SplitMenuButton choose_map;
-
-    @FXML
-    private Rectangle form1;
-
-    @FXML
-    private Rectangle form2;
-
-    @FXML
-    private Rectangle form3;
-
-    @FXML
-    private Rectangle form4;
-
-    @FXML
-    private Rectangle form_rounds;
-
-    @FXML
-    private Rectangle form_time;
-
-    @FXML
-    private ImageView image_map1;
-
-    @FXML
-    private ImageView image_map2;
-
-    @FXML
-    private ImageView image_map3;
-
-    @FXML
-    private MenuItem map1;
-
-    @FXML
-    private MenuItem map2;
-
-    @FXML
-    private MenuItem map3;
-
-    @FXML
-    private Button num1_button;
-
-    @FXML
-    private Button num2_button;
-
-    @FXML
-    private Button num3_button;
-
-    @FXML
-    private TextField player1_name;
-
-    @FXML
-    private TextField player2_name;
-
-    @FXML
-    private TextField player3_name;
-
-    @FXML
-    private TextField player4_name;
-
-    @FXML
-    private Slider sl_rounds;
-
-    @FXML
-    private Slider sl_time;
-
-    @FXML
-    private TextField text_rounds;
-
-    @FXML
-    private TextField text_time;
-
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        sl_rounds.valueProperty().addListener((observable, oldValue, newValue) -> {
-
-            text_rounds.setText(Integer.toString(newValue.intValue()));
-
-
-        });
-        sl_time.valueProperty().addListener((observable, oldValue, newValue) -> {
-
-            text_time.setText(Double.toString(newValue.doubleValue()));
-
-
-        });
-
+    public static void setPlayerName(String playerName, int x) {
+        Controller.playersNames[x] = playerName;
     }
-//    --------end--vor-o-na--------
+
 }

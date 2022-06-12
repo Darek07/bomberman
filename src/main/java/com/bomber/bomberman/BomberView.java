@@ -9,7 +9,7 @@ import javafx.scene.image.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bomber.bomberman.Controller.PLAYERS_AMOUNT;
+import static com.bomber.bomberman.Controller.PLAYERS_NUMBER;
 
 public class BomberView extends Group {
     public final static int CELL_SIZE = 40;
@@ -19,8 +19,8 @@ public class BomberView extends Group {
     @FXML private int columnCount;
     private BomberModel bomberModel;
     private ImageView[][] cellViews;
-    private final List<ImageView> playersViews = new ArrayList<>(PLAYERS_AMOUNT);
-    private final Image[] playersImages = new Image[PLAYERS_AMOUNT];
+    private final List<ImageView> playersViews = new ArrayList<>(PLAYERS_NUMBER);
+    private final Image[] playersImages = new Image[PLAYERS_NUMBER];
     private final Image unbreakableWallImage;
     private final Image breakableWallImage;
     private final Image bombImage;
@@ -34,7 +34,7 @@ public class BomberView extends Group {
         this.bombImage = new Image(getClass().getResourceAsStream(base + "bomb.png"));
         this.fireImage = new Image(getClass().getResourceAsStream(base + "fire.png"));
         this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.png"));
-        for (int i = 0; i < PLAYERS_AMOUNT; i++) {
+        for (int i = 0; i < PLAYERS_NUMBER; i++) {
             this.playersImages[i] = new Image(getClass().getResourceAsStream(base + "player" + i + ".gif"));
         }
     }
@@ -60,7 +60,7 @@ public class BomberView extends Group {
     public void initializePlayersViews() {
         playersViews.forEach(playerView -> playerView.setImage(null));
         playersViews.clear();
-        for (int i = 0; i < PLAYERS_AMOUNT; i++) {
+        for (int i = 0; i < PLAYERS_NUMBER; i++) {
             ImageView imageView = new ImageView();
             imageView.setFitWidth(PLAYER_SIZE);
             imageView.setFitHeight(PLAYER_SIZE);
@@ -70,7 +70,7 @@ public class BomberView extends Group {
     }
 
     public void updatePlayersViews() {
-        if (playersViews.size() == 0) {
+        if (playersViews.size() != PLAYERS_NUMBER) {
             initializePlayersViews();
         }
         for (int i = 0; i < playersViews.size(); i++) {

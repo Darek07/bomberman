@@ -17,9 +17,12 @@ public class Player extends AnimationTimer {
 	private int fireDistance = 3;
 	private long lastUpdateTime = 0;
 
+	private final String name;
+
 	public Player(BomberModel model, int playerID, int col, int row) {
 		this.model = model;
 		this.playerID = playerID;
+		this.name = Controller.getPlayerName(playerID);
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
 		this.playerSpeed = 15;
 		this.playerDirection = Direction.NONE;
@@ -114,5 +117,9 @@ public class Player extends AnimationTimer {
 
 	public int getPlayerID() {
 		return playerID;
+	}
+
+	public String getName() {
+		return name;
 	}
 }
