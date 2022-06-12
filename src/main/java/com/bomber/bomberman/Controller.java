@@ -1,5 +1,6 @@
 package com.bomber.bomberman;
 
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -41,6 +42,21 @@ public class Controller extends Thread implements EventHandler<KeyEvent> {
 
     public Controller() {
         this.paused = false;
+        new AnimationTimer() {
+            long lastTime = 0;
+            @Override
+            public void handle(long now) {
+                if (lastTime == 0) {
+                    lastTime = now;
+                    return;
+                }
+                final double elapsedMicroSeconds = (now - lastTime) / 1_000.0 ;
+                if (elapsedMicroSeconds >= 1000) {
+                    update();
+                    lastTime = now;
+                }
+            }
+        }.start();
     }
 
     public void initialize() {

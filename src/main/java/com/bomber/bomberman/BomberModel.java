@@ -1,7 +1,5 @@
 package com.bomber.bomberman;
 
-import javafx.geometry.Point2D;
-
 import javafx.fxml.FXML;
 import java.io.*;
 
@@ -87,8 +85,7 @@ public class BomberModel {
 
     public void setMoving(Direction direction, int player, boolean isMove) {
         if (player >= players.size()) return;
-        players.get(player).setPlayerDirection(direction);
-        players.get(player).setMoving(isMove);
+        players.get(player).setPlayerDirectionAndMove(direction, isMove);
     }
 
     public static boolean isYouWon() {

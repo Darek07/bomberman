@@ -1,12 +1,12 @@
 package com.bomber.bomberman;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 
 import static com.bomber.bomberman.BomberView.PLAYER_SIZE;
 import static com.bomber.bomberman.BomberView.CELL_SIZE;
 
-public class Player extends Thread {
-	private static final int STEP_DISTANCE = 10;
+public class Player extends AnimationTimer {
 	private final int playerID;
 	private Point2D playerLocation;
 	private Integer playerSpeed;
@@ -15,12 +15,13 @@ public class Player extends Thread {
 	private BomberModel model;
 	private boolean isInsideBomb;
 	private int fireDistance = 3;
+	private long lastUpdateTime = 0;
 
 	public Player(BomberModel model, int playerID, int col, int row) {
 		this.model = model;
 		this.playerID = playerID;
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
-		this.playerSpeed = 200;
+		this.playerSpeed = 15;
 		this.playerDirection = Direction.NONE;
 		this.isMoving = false;
 		this.isInsideBomb = false;
@@ -28,14 +29,15 @@ public class Player extends Thread {
 	}
 
 	@Override
-	public void run() {
-		while (true) {
-			try {
-				movePlayer();
-				Thread.sleep(playerSpeed);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public void handle(long now) {
+		if (lastUpdateTime == 0 || lastUpdateTime >= now) {
+			lastUpdateTime = now;
+			return;
+		}
+		final double elapsedMilliSeconds = (now - lastUpdateTime) / 1_000_000.0 ;
+		if (elapsedMilliSeconds >= playerSpeed) {
+			movePlayer();
+			lastUpdateTime = now;
 		}
 	}
 
@@ -44,7 +46,7 @@ public class Player extends Thread {
 			return;
 		}
 
-		Point2D newLocation = this.playerLocation.add(playerDirection.velocity.multiply(STEP_DISTANCE));
+		Point2D newLocation = this.playerLocation.add(playerDirection.velocity);
 		if (!isLocationCollide(newLocation)) {
 			this.playerLocation = newLocation;
 		}
@@ -111,11 +113,11 @@ public class Player extends Thread {
 		return isMoving;
 	}
 
-	public void setMoving(boolean moving) {
-		isMoving = moving;
-	}
-
-	public void setPlayerDirection(Direction playerDirection) {
-		this.playerDirection = playerDirection;
+	public void setPlayerDirectionAndMove(Direction direction, boolean move) {
+		if (this.isMoving && !move && this.playerDirection != direction) {
+			return;
+		}
+		this.playerDirection = direction;
+		this.isMoving = move;
 	}
 }
