@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.bomber.bomberman.Controller.PLAYERS_NUMBER;
@@ -75,7 +76,7 @@ public class BomberView extends Group {
         }
         for (int i = 0; i < playersViews.size(); i++) {
             Player player = bomberModel.getPlayerByID(i);
-            if (player == null) {
+            if (player.isDied()) {
                 playersViews.get(i).setImage(null);
                 continue;
             }

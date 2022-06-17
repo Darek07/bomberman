@@ -1,13 +1,24 @@
 package com.bomber.bomberman;
 
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,22 +26,29 @@ import java.util.Set;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 
 public class Controller extends Thread implements EventHandler<KeyEvent>, Initializable {
     public static int PLAYERS_NUMBER = 3;
     private static String mapFile;
     private static int roundsNumber;
-    private static long roundTimeMs;
+    private static int roundTimeSec;
     private static final String[] playersNames = new String[PLAYERS_NUMBER];
 
-    @FXML private Label scoreLabel;
-    @FXML private Label levelLabel;
-    @FXML private Label gameOverLabel;
+    @FXML private BorderPane labels;
+    @FXML private Label playersLabel;
+    @FXML private Label roundsLabel;
+    @FXML private Label timeLabel;
     @FXML private BomberView bomberView;
     private BomberModel bomberModel;
     private boolean paused;
+    private Timeline clock;
+    private long timeStart;
+    private int currentRound;
+    private AnimationTimer animationTimer;
+    private boolean isPaused;
 
-    private static final String[] mapFiles = { Controller.class.getResource("map.txt").getFile().substring(3) };
+    public static final String[] mapFiles = { Controller.class.getResource("map.txt").getFile().substring(3) };
     public static final KeyCode[] PLAYER0KEYS = { KeyCode.LEFT, KeyCode.RIGHT, KeyCode.DOWN, KeyCode.UP, KeyCode.SLASH };
     public static final KeyCode[] PLAYER1KEYS = { KeyCode.A, KeyCode.D, KeyCode.S, KeyCode.W, KeyCode.TAB };
     public static final KeyCode[] PLAYER2KEYS = { KeyCode.H, KeyCode.K, KeyCode.J, KeyCode.U, KeyCode.SPACE };
@@ -63,7 +81,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         this.bomberView.setBomberModel(bomberModel);
         this.bomberView.initializePlayersViews();
 
-        new AnimationTimer() {
+        this.animationTimer = new AnimationTimer() {
             long lastTime = 0;
             @Override
             public void handle(long now) {
@@ -73,17 +91,35 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
                 }
                 final double elapsedMicroSeconds = (now - lastTime) / 1_000.0 ;
                 if (elapsedMicroSeconds >= 1000) {
+                    int alive = bomberModel.getNumAlivePlayers();
+                    if (alive <= 1 && alive != PLAYERS_NUMBER || clock.getStatus() == Animation.Status.STOPPED) {
+                        endRound();
+                    }
                     update();
                     lastTime = now;
                 }
             }
-        }.start();
+        };
+
+        this.currentRound = 0;
+        this.labels.setPrefHeight(PLAYERS_NUMBER * labels.getPrefHeight() + labels.getPadding().getBottom());
+        this.clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+            long millis = System.currentTimeMillis() - timeStart;
+            String txt = String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(millis) -
+                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                    TimeUnit.MILLISECONDS.toSeconds(millis) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+            this.timeLabel.setText(txt);
+        }), new KeyFrame(Duration.seconds(1)));
+        this.clock.setCycleCount(roundTimeSec);
+        startRound();
     }
 
     @Override
     public void handle(KeyEvent keyEvent) {
         boolean keyRecognized = true;
-        boolean bomb = false;
+        boolean bombKey = false;
         boolean isPressed = keyEvent.getEventType().equals(KeyEvent.KEY_PRESSED);
         KeyCode code = keyEvent.getCode();
         Direction direction = Direction.NONE;
@@ -100,24 +136,39 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
             direction = Direction.UP;
         }
         else if (BOMB_KEYS.stream().anyMatch(k -> k == code)) {
-            bomb = true;
+            bombKey = true;
         }
-//        else if (code == KeyCode.R) {
-//            pause();
-//            bomberModel.startNewGame();
-//            gameOverLabel.setText(String.format(""));
-//            paused = false;
-//        }
+        else if (code == KeyCode.ENTER && isPaused && currentRound < roundsNumber) {
+            startRound();
+            keyRecognized = false;
+        }
+        else if (code == KeyCode.R && isPaused && currentRound >= roundsNumber) {
+            Stage stage = (Stage) ((Node) keyEvent.getSource()).getScene().getWindow();
+            try {
+                URL resource = getClass().getResource("bomberman_start.fxml");
+                assert resource != null;
+                FXMLLoader loader = new FXMLLoader(resource);
+                Parent root = loader.load();
+
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.setResizable(true);
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            keyRecognized = false;
+        }
         else keyRecognized = false;
 
         if (keyRecognized) {
             keyEvent.consume();
             int playerID = getPlayerByKey(code);
             Player player = bomberModel.getPlayerByID(playerID);
-            if (player == null) {
+            if (player.isDied()) {
                 return;
             }
-            if (bomb && isPressed) {
+            if (bombKey && isPressed) {
                 bomberModel.setBomb(player);
             }
             else {
@@ -129,15 +180,44 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
     private void update() {
         this.bomberView.updatePlayersViews();
         this.bomberView.updateGridViews();
-        this.scoreLabel.setText(String.format("Score: %d", this.bomberModel.getScore()));
-        this.levelLabel.setText(String.format("Level: %d", 0));
-        if (bomberModel.isGameOver()) {
-            this.gameOverLabel.setText(String.format("GAME OVER"));
-            pause();
+        updateLabels();
+    }
+
+    private void updateLabels() {
+        StringBuilder format = new StringBuilder();
+        Player player;
+        for (int i = 0; i < PLAYERS_NUMBER; i++) {
+            player = bomberModel.getPlayerByID(i);
+            format.append(String.format("%s: %d wins | %d loses\n", playersNames[i], player.getWins(), player.getDies()));
         }
-        if (bomberModel.isYouWon()) {
-            this.gameOverLabel.setText(String.format("YOU WON!"));
+        this.playersLabel.setText(format.toString());
+        this.roundsLabel.setText(String.format("Round: %d", currentRound));
+    }
+
+    private void startRound() {
+        bomberModel.restoreData();
+        isPaused = false;
+        animationTimer.start();
+        currentRound++;
+        this.timeStart = System.currentTimeMillis();
+        this.clock.play();
+        updateLabels();
+    }
+
+    private void endRound() {
+        if (bomberModel.isTempCellValues()) {
+            return;
         }
+        this.animationTimer.stop();
+        this.clock.stop();
+        bomberModel.determineRoundWinner();
+        isPaused = true;
+        endGame();
+    }
+
+    private void endGame() {
+        Player winner = bomberModel.getWinner();
+        System.out.println(winner.getName());
     }
 
     public int getPlayerByKey(KeyCode key) {
@@ -182,8 +262,8 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         Controller.roundsNumber = roundsNumber;
     }
 
-    public static void setRoundTimeMs(long roundTimeMs) {
-        Controller.roundTimeMs = roundTimeMs;
+    public static void setRoundTimeSec(int roundTimeSec) {
+        Controller.roundTimeSec = roundTimeSec;
     }
 
     public static String getPlayerName(int x) {

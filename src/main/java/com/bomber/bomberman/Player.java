@@ -9,13 +9,18 @@ import static com.bomber.bomberman.BomberView.CELL_SIZE;
 public class Player extends AnimationTimer {
 	private final int playerID;
 	private final BomberModel model;
+	private final Point2D playerInitialLocation;
+	private final Integer playerInitialSpeed;
 	private Point2D playerLocation;
 	private Integer playerSpeed;
 	private Direction playerDirection;
 	private boolean isMoving;
 	private boolean isInsideBomb;
+	private boolean isDied = false;
 	private int fireDistance = 3;
 	private long lastUpdateTime = 0;
+	private int dies = 0;
+	private int wins = 0;
 
 	private final String name;
 
@@ -24,7 +29,9 @@ public class Player extends AnimationTimer {
 		this.playerID = playerID;
 		this.name = Controller.getPlayerName(playerID);
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
-		this.playerSpeed = 15;
+		this.playerInitialLocation = this.playerLocation;
+		this.playerSpeed = 10;
+		this.playerInitialSpeed = this.playerSpeed;
 		this.playerDirection = Direction.NONE;
 		this.isMoving = false;
 		this.isInsideBomb = false;
@@ -99,6 +106,18 @@ public class Player extends AnimationTimer {
 		this.isMoving = move;
 	}
 
+	public void restoreInitialValues() {
+		playerLocation = playerInitialLocation;
+		playerSpeed = this.playerInitialSpeed;
+		playerDirection = Direction.NONE;
+		isMoving = false;
+		isInsideBomb = false;
+		isDied = false;
+		fireDistance = 3;
+		lastUpdateTime = 0;
+		this.start();
+	}
+
 	public void setIsInsideBomb() {
 		isInsideBomb = true;
 	}
@@ -121,5 +140,33 @@ public class Player extends AnimationTimer {
 
 	public String getName() {
 		return name;
+	}
+
+	public int getDies() {
+		return dies;
+	}
+
+	public void increaseDies() {
+		this.dies++;
+	}
+
+	public int getWins() {
+		return wins;
+	}
+
+	public void increaseWins() {
+		this.wins++;
+	}
+
+	public boolean isDied() {
+		return isDied;
+	}
+
+	public void setDied(boolean died) {
+		isDied = died;
+		if (died) {
+			increaseDies();
+			this.stop();
+		}
 	}
 }

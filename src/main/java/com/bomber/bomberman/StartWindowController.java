@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 
 public class StartWindowController implements Initializable {
 
-	public static final long milliSecondsPerMinute = 60_000;
+	public static final int secondsPerMinute = 60;
 	@FXML
 	public Button submitButton;
 	//    ----------vor-o-na-----------
@@ -149,7 +149,7 @@ public class StartWindowController implements Initializable {
 		Controller.setPlayersNumber(getPlayersNumber());
 		Controller.setMapFile(getSelectedMap());
 		Controller.setRoundsNumber(getRoundsNumber());
-		Controller.setRoundTimeMs(getTimePerRound());
+		Controller.setRoundTimeSec(getTimePerRound());
 		configurePlayersNames();
 	}
 
@@ -193,8 +193,8 @@ public class StartWindowController implements Initializable {
 		return (int)sl_rounds.getValue();
 	}
 
-	private long getTimePerRound() {
-		return (long)sl_time.getValue() * milliSecondsPerMinute;
+	private int getTimePerRound() {
+		return (int)(sl_time.getValue() * secondsPerMinute);
 	}
 
 	private void configurePlayersNames() {

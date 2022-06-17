@@ -1,17 +1,19 @@
 package com.bomber.bomberman;
 
 import javafx.fxml.FXML;
+
 import java.io.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class BomberModel {
 
-    private final List<Player> players = new ArrayList<>(Controller.PLAYERS_NUMBER);
+    private final List<Player> alivePlayers = new ArrayList<>(Controller.PLAYERS_NUMBER);
+    private List<Player> ripPlayers = new ArrayList<>(Controller.PLAYERS_NUMBER);
     @FXML private int rowCount;
     @FXML private int columnCount;
     private CellValue[][] grid;
-    private int score;
     private static boolean gameOver;
     private static boolean youWon;
 
@@ -24,7 +26,6 @@ public class BomberModel {
         this.youWon = false;
         rowCount = 0;
         columnCount = 0;
-        score = 0;
         initializeMap(Controller.getMapFile());
     }
 
@@ -60,8 +61,8 @@ public class BomberModel {
                     case '&' -> cell = CellValue.BREAKABLEWALL;
                     case 'P' -> {
                         cell = CellValue.EMPTY;
-                        if (players.size() < Controller.PLAYERS_NUMBER) {
-                            players.add(new Player(this, players.size(), column, row));
+                        if (alivePlayers.size() < Controller.PLAYERS_NUMBER) {
+                            alivePlayers.add(new Player(this, alivePlayers.size(), column, row));
                         }
                     }
                     default -> cell = CellValue.EMPTY;
@@ -100,14 +101,6 @@ public class BomberModel {
         grid[row][column] = cellValue;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void addToScore(int points) {
-        this.score += points;
-    }
-
     public int getRowCount() {
         return rowCount;
     }
@@ -116,16 +109,51 @@ public class BomberModel {
         return columnCount;
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public List<Player> getAlivePlayers() {
+        return alivePlayers;
+    }
+
+    public int getNumAlivePlayers() {
+        return alivePlayers.size();
     }
 
     public Player getPlayerByID(int playerID) {
-        for (Player player : players) {
-            if (player.getPlayerID() == playerID) {
-                return player;
-            }
+        return Stream.of(alivePlayers, ripPlayers)
+                .flatMap(Collection::stream)
+                .filter(player -> player.getPlayerID() == playerID)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addRipPlayers(List<Player> ripPlayers) {
+        this.ripPlayers.addAll(ripPlayers);
+        this.alivePlayers.removeAll(ripPlayers);
+        ripPlayers.forEach(player -> player.setDied(true));
+    }
+
+    public void restoreData() {
+        alivePlayers.addAll(ripPlayers);
+        ripPlayers.clear();
+        alivePlayers.forEach(Player::restoreInitialValues);
+    }
+
+    public Player determineRoundWinner() {
+        Player player = (alivePlayers.size() == 1 ? alivePlayers.get(0) : null);
+        if (player != null) {
+            player.increaseWins();
+            ripPlayers.add(player);
+            alivePlayers.remove(player);
         }
-        return null;
+        return player;
+    }
+
+    public boolean isTempCellValues() {
+        return Arrays.stream(grid).flatMap(Arrays::stream).anyMatch(cell -> cell == CellValue.RIP || cell == CellValue.FIRE);
+    }
+
+    public Player getWinner() {
+        return Stream.of(alivePlayers, ripPlayers)
+                .flatMap(Collection::stream).max((p1, p2) -> p1.getWins() - p2.getWins())
+                .orElse(null);
     }
 }

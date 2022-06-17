@@ -5,21 +5,25 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
 
+<?import javafx.geometry.Insets?>
 <BorderPane fx:controller="com.bomber.bomberman.Controller"
             style="-fx-background-color: black;"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml">
     <top>
-        <BorderPane prefHeight="35" style="-fx-background-color: #0B5091; -fx-padding: 10px, 5px, 10px, 5px">
+        <BorderPane fx:id="labels" prefHeight="30" style="-fx-background-color: #0B5091">
             <left>
-                <Label fx:id="scoreLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+                <Label fx:id="playersLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
             </left>
             <center>
-                <Label fx:id="gameOverLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+                <Label fx:id="timeLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
             </center>
             <right>
-                <Label fx:id="levelLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
+                <Label fx:id="roundsLabel" style="-fx-font-size: 150%; -fx-text-fill: white"/>
             </right>
+            <padding>
+                <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+            </padding>
         </BorderPane>
     </top>
 

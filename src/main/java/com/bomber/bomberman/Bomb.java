@@ -1,5 +1,6 @@
 package com.bomber.bomberman;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 
 import java.util.*;
@@ -13,10 +14,36 @@ public class Bomb extends Thread {
 	private final Player player;
 	private Point2D location;
 	private int distance;
+	private AnimationTimer fireClock;
+	private volatile boolean isFire;
 
 	public Bomb(BomberModel bomberModel, Player player) {
 		this.bomberModel = bomberModel;
 		this.player = player;
+		this.isFire = false;
+//		this.fireClock = new AnimationTimer() {
+//			long lastTime = 0;
+//			int hitted = 0;
+//			@Override
+//			public void handle(long now) {
+//				if (lastTime == 0) {
+//					lastTime = now;
+//					return;
+//				}
+//				final double elapsedMicroSeconds = (now - lastTime) / 1_000.0 ;
+//				if (elapsedMicroSeconds >= 1000) {
+//					this.stop();
+//					endBoom();
+//					lastTime = 0;
+//				}
+//				if (isHitPlayer()) {
+//					hitted =
+//				}
+//				if (hitted != 0) {
+//
+//				}
+//			}
+//		};
 		this.start();
 	}
 
@@ -87,6 +114,7 @@ public class Bomb extends Thread {
 				}
 			);
 		}
+		isFire = true;
 	}
 
 	private void endBoom() {
@@ -97,11 +125,11 @@ public class Bomb extends Thread {
 				bomberModel.setCellValue(CellValue.EMPTY, row, col);
 			}
 		});
+		isFire = false;
 	}
 
-	private boolean isHitPlayer() {
-		List<Player> players = bomberModel.getPlayers();
-		boolean isHitAnyone = players.stream().anyMatch(player -> {
+	public boolean isHitPlayer() {
+		boolean isHitAnyone = bomberModel.getAlivePlayers().stream().anyMatch(player -> {
 			Point2D location = player.getPlayerLocation();
 			int row = (int)location.getY() / BomberView.CELL_SIZE;
 			int col = (int)location.getX() / BomberView.CELL_SIZE;
@@ -113,7 +141,7 @@ public class Bomb extends Thread {
 			}
 			return false;
 		});
-		players.removeAll(hitPlayers);
+		bomberModel.addRipPlayers(hitPlayers);
 		return isHitAnyone;
 	}
 
@@ -123,5 +151,9 @@ public class Bomb extends Thread {
 			int col = (int)ripPosition.getX() / BomberView.CELL_SIZE;
 			bomberModel.setCellValue(CellValue.EMPTY, row, col);
 		});
+	}
+
+	public boolean isFire() {
+		return isFire;
 	}
 }
