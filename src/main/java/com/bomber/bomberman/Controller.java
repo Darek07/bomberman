@@ -138,11 +138,13 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         else if (BOMB_KEYS.stream().anyMatch(k -> k == code)) {
             bombKey = true;
         }
-        else if (code == KeyCode.ENTER && isPaused && currentRound < roundsNumber) {
+        else if (isPressed && code == KeyCode.ENTER && !isEndGame()) {
+            System.out.println("enter");
             startRound();
             keyRecognized = false;
         }
-        else if (code == KeyCode.R && isPaused && currentRound >= roundsNumber) {
+        else if (isPressed && code == KeyCode.R && isEndGame()) {
+            System.out.println("r");
             Stage stage = (Stage) ((Node) keyEvent.getSource()).getScene().getWindow();
             try {
                 URL resource = getClass().getResource("bomberman_start.fxml");
@@ -212,12 +214,17 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         this.clock.stop();
         bomberModel.determineRoundWinner();
         isPaused = true;
-        endGame();
+        if (isEndGame()) {
+            Player winner = bomberModel.getWinner();
+            timeLabel.setText(String.format("WINNER %s.\nPress R to restart the game", winner.getName()));
+        }
+        else {
+            timeLabel.setText("Press Enter to start next round");
+        }
     }
 
-    private void endGame() {
-        Player winner = bomberModel.getWinner();
-        System.out.println(winner.getName());
+    private boolean isEndGame() {
+        return isPaused && currentRound >= roundsNumber;
     }
 
     public int getPlayerByKey(KeyCode key) {

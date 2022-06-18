@@ -25,7 +25,6 @@ public class Bomb extends Thread {
 			long lastTime = 0;
 			@Override
 			public void handle(long now) {
-				System.out.println(isDaemon());
 				if (lastTime == 0) {
 					lastTime = now;
 					new Timer(true).schedule(new TimerTask() {

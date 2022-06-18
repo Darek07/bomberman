@@ -153,7 +153,7 @@ public class BomberModel {
 
     public Player getWinner() {
         return Stream.of(alivePlayers, ripPlayers)
-                .flatMap(Collection::stream).max((p1, p2) -> p1.getWins() - p2.getWins())
+                .flatMap(Collection::stream).max(Comparator.comparingInt(Player::getWins))
                 .orElse(null);
     }
 }
