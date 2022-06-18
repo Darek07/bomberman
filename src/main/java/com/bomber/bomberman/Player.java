@@ -163,6 +163,9 @@ public class Player extends AnimationTimer {
 	}
 
 	public void setDied(boolean died) {
+		if (this.isDied == died) {
+			return;
+		}
 		isDied = died;
 		if (died) {
 			increaseDies();

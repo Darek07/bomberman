@@ -21,29 +21,37 @@ public class Bomb extends Thread {
 		this.bomberModel = bomberModel;
 		this.player = player;
 		this.isFire = false;
-//		this.fireClock = new AnimationTimer() {
-//			long lastTime = 0;
-//			int hitted = 0;
-//			@Override
-//			public void handle(long now) {
-//				if (lastTime == 0) {
-//					lastTime = now;
-//					return;
-//				}
-//				final double elapsedMicroSeconds = (now - lastTime) / 1_000.0 ;
-//				if (elapsedMicroSeconds >= 1000) {
-//					this.stop();
-//					endBoom();
-//					lastTime = 0;
-//				}
-//				if (isHitPlayer()) {
-//					hitted =
-//				}
-//				if (hitted != 0) {
-//
-//				}
-//			}
-//		};
+		this.fireClock = new AnimationTimer() {
+			long lastTime = 0;
+			@Override
+			public void handle(long now) {
+				System.out.println(isDaemon());
+				if (lastTime == 0) {
+					lastTime = now;
+					new Timer(true).schedule(new TimerTask() {
+						@Override
+						public void run() {
+							endBoom();
+						}
+					}, 1000);
+					return;
+				}
+				final double elapsedMicroSeconds = (now - lastTime) / 1_000.0;
+				if (elapsedMicroSeconds < 100) {
+					return;
+				}
+				if (isHitPlayer()) {
+					Timer tim = new Timer(true);
+					tim.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							clearRIP();
+						}
+					}, 3000);
+				}
+				lastTime = now;
+			}
+		};
 		this.start();
 	}
 
@@ -53,13 +61,7 @@ public class Bomb extends Thread {
 		try {
 			Thread.sleep(3000);
 			boom();
-			boolean isRIP = isHitPlayer();
-			Thread.sleep(1000);
-			endBoom();
-			if (isRIP) {
-				Thread.sleep(2000);
-				clearRIP();
-			}
+			fireClock.start();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -126,6 +128,7 @@ public class Bomb extends Thread {
 			}
 		});
 		isFire = false;
+		this.fireClock.stop();
 	}
 
 	public boolean isHitPlayer() {
