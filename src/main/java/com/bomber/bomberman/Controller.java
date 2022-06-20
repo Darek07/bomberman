@@ -140,10 +140,13 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
 
         keyEvent.consume();
         Player player = getPlayerByKey(keyCode);
-        if (player.isDied()) {
+        if (player == null || player.isDied()) {
             return;
         }
-        if (bombKey && isPressed) {
+        if (bombKey) {
+            if (!isPressed){
+                return;
+            }
             bomberModel.setBomb(player);
         }
         else {
