@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.bomber.bomberman/com.bomber.bomberman.Bomber</mainClass>
+                            <mainClass>com.bomber.bomberman/com.bomber.bomberman.Bomberman</mainClass>
                         </configuration>
                     </execution>
                 </executions>

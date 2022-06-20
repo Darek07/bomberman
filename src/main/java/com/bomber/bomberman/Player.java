@@ -30,7 +30,7 @@ public class Player extends AnimationTimer {
 		this.name = Controller.getPlayerName(playerID);
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
 		this.playerInitialLocation = this.playerLocation;
-		this.playerSpeed = 10;
+		this.playerSpeed = 2;
 		this.playerInitialSpeed = this.playerSpeed;
 		this.playerDirection = Direction.NONE;
 		this.isMoving = false;

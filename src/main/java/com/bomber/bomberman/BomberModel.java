@@ -14,16 +14,12 @@ public class BomberModel {
     @FXML private int rowCount;
     @FXML private int columnCount;
     private CellValue[][] grid;
-    private static boolean gameOver;
-    private static boolean youWon;
 
     public BomberModel() {
         this.startNewGame();
     }
 
     public void startNewGame() {
-        this.gameOver = false;
-        this.youWon = false;
         rowCount = 0;
         columnCount = 0;
         initializeMap(Controller.getMapFile());
@@ -72,20 +68,57 @@ public class BomberModel {
         }
     }
 
+    public Player getPlayerByID(int playerID) {
+        return Stream.of(alivePlayers, ripPlayers)
+                .flatMap(Collection::stream)
+                .filter(player -> player.getPlayerID() == playerID)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addRipPlayers(List<Player> ripPlayers) {
+        ripPlayers.forEach(player -> {
+            if (!this.ripPlayers.contains(player)){
+                this.ripPlayers.add(player);
+                player.setDied(true);
+            }
+        });
+        this.alivePlayers.removeAll(ripPlayers);
+        System.out.println(this.ripPlayers.size());
+    }
+
+    public void restoreData() {
+        alivePlayers.addAll(ripPlayers);
+        ripPlayers.clear();
+        alivePlayers.forEach(Player::restoreInitialValues);
+    }
+
+    public Player determineRoundWinner() {
+        Player player = (alivePlayers.size() == 1 ? alivePlayers.get(0) : null);
+        if (player != null) {
+            player.increaseWins();
+            ripPlayers.add(player);
+            alivePlayers.remove(player);
+        }
+        return player;
+    }
+
+    public boolean isAnyBombAppears() {
+        return Arrays.stream(grid).flatMap(Arrays::stream).anyMatch(cell -> cell == CellValue.RIP || cell == CellValue.FIRE);
+    }
+
+    public Player getWinner() {
+        return Stream.of(alivePlayers, ripPlayers)
+                .flatMap(Collection::stream).max(Comparator.comparingInt(Player::getWins))
+                .orElse(null);
+    }
+
     public void setBomb(Player player) {
         new Bomb(this, player);
     }
 
     public void setPlayerMove(Player player, Direction direction, boolean isMove) {
         player.setPlayerDirectionAndMove(direction, isMove);
-    }
-
-    public static boolean isYouWon() {
-        return youWon;
-    }
-
-    public static boolean isGameOver() {
-        return gameOver;
     }
 
     public CellValue getCellValue(int row, int column) {
@@ -115,45 +148,5 @@ public class BomberModel {
 
     public int getNumAlivePlayers() {
         return alivePlayers.size();
-    }
-
-    public Player getPlayerByID(int playerID) {
-        return Stream.of(alivePlayers, ripPlayers)
-                .flatMap(Collection::stream)
-                .filter(player -> player.getPlayerID() == playerID)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void addRipPlayers(List<Player> ripPlayers) {
-        this.ripPlayers.addAll(ripPlayers);
-        this.alivePlayers.removeAll(ripPlayers);
-        ripPlayers.forEach(player -> player.setDied(true));
-    }
-
-    public void restoreData() {
-        alivePlayers.addAll(ripPlayers);
-        ripPlayers.clear();
-        alivePlayers.forEach(Player::restoreInitialValues);
-    }
-
-    public Player determineRoundWinner() {
-        Player player = (alivePlayers.size() == 1 ? alivePlayers.get(0) : null);
-        if (player != null) {
-            player.increaseWins();
-            ripPlayers.add(player);
-            alivePlayers.remove(player);
-        }
-        return player;
-    }
-
-    public boolean isTempCellValues() {
-        return Arrays.stream(grid).flatMap(Arrays::stream).anyMatch(cell -> cell == CellValue.RIP || cell == CellValue.FIRE);
-    }
-
-    public Player getWinner() {
-        return Stream.of(alivePlayers, ripPlayers)
-                .flatMap(Collection::stream).max(Comparator.comparingInt(Player::getWins))
-                .orElse(null);
     }
 }

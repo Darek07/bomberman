@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URL;
 
-public class Bomber extends Application {
+public class Bomberman extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
