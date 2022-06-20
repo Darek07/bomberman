@@ -24,6 +24,7 @@ public class BomberView extends Group {
 	@FXML private Label playersLabel;
 	@FXML private Label roundsLabel;
 	@FXML private Label timeLabel;
+	@FXML private Label bottomLabel;
 	private ImageView[][] cellViews;
 	private final List<ImageView> playersViews = new ArrayList<>(PLAYERS_NUMBER);
 	private final Image[] playersImages = new Image[PLAYERS_NUMBER];
@@ -77,6 +78,7 @@ public class BomberView extends Group {
 
 	public void initializeInfo() {
 		this.labels.setPrefHeight(PLAYERS_NUMBER * labels.getPrefHeight() + labels.getPadding().getBottom());
+		this.bottomLabel.setText("Next round: Enter / New game: R\nMove: arrow keys / WASD / UHJK\nBomb: Slash TAB Space");
 	}
 
 	public void updatePlayersViews(BomberModel bomberModel) {
@@ -177,5 +179,9 @@ public class BomberView extends Group {
 
 	public void setTimeLabel(Label timeLabel) {
 		this.timeLabel = timeLabel;
+	}
+
+	public void setBottomLabel(Label bottomLabel) {
+		this.bottomLabel = bottomLabel;
 	}
 }

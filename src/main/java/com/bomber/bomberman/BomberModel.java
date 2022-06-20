@@ -26,7 +26,7 @@ public class BomberModel {
     }
 
     public void initializeMap(String mapFile) {
-
+        System.out.println(mapFile);
         File file = new File(mapFile);
         Scanner scanner = null;
         try {

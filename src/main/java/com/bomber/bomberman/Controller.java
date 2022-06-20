@@ -37,6 +37,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
     @FXML private Label playersLabel;
     @FXML private Label roundsLabel;
     @FXML private Label timeLabel;
+    @FXML private Label bottomLabel;
     @FXML private BomberView bomberView;
     private BomberModel bomberModel;
     private Timeline clock;
@@ -206,6 +207,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         this.bomberView.setPlayersLabel(this.playersLabel);
         this.bomberView.setRoundsLabel(this.roundsLabel);
         this.bomberView.setTimeLabel(this.timeLabel);
+        this.bomberView.setBottomLabel(this.bottomLabel);
 
         this.bomberView.initializePlayersViews();
         this.bomberView.initializeInfo();
