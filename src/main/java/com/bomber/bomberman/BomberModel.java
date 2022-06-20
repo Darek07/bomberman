@@ -25,14 +25,13 @@ public class BomberModel {
         initializeMap(Controller.getMapFile());
     }
 
-    public void initializeMap(String mapFile) {
-        System.out.println(mapFile);
-        File file = new File(mapFile);
+    public void initializeMap(File file) {
         Scanner scanner = null;
         try {
             scanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             System.out.println("Could not open map file");
+            System.exit(1);
         }
 
         columnCount = scanner.nextLine().length();

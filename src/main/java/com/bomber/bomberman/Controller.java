@@ -17,7 +17,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,7 +31,7 @@ import java.util.ResourceBundle;
 
 public class Controller extends Thread implements EventHandler<KeyEvent>, Initializable {
     public static int PLAYERS_NUMBER = 3;
-    private static String mapFile;
+    private static File mapFile;
     private static int roundsNumber;
     private static int roundTimeSec;
     private static final String[] playersNames = new String[PLAYERS_NUMBER];
@@ -46,7 +49,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
     private AnimationTimer animationTimer;
     private boolean isPaused;
 
-    public static final String[] mapFiles = { Controller.class.getResource("map.txt").getFile().substring(3) };
+    public static final URL[] mapFiles = { Controller.class.getResource("map.txt") };
     public static final KeyCode[] PLAYER0KEYS = { KeyCode.LEFT, KeyCode.RIGHT, KeyCode.DOWN, KeyCode.UP, KeyCode.SLASH };
     public static final KeyCode[] PLAYER1KEYS = { KeyCode.A, KeyCode.D, KeyCode.S, KeyCode.W, KeyCode.TAB };
     public static final KeyCode[] PLAYER2KEYS = { KeyCode.H, KeyCode.K, KeyCode.J, KeyCode.U, KeyCode.SPACE };
@@ -231,7 +234,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         return BomberView.CELL_SIZE * this.bomberView.getRowCount();
     }
 
-    public static String getMapFile() {
+    public static File getMapFile() {
         return mapFile;
     }
 
@@ -239,7 +242,12 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         if (x < 0 || x >= mapFiles.length) {
             throw new NullPointerException();
         }
-        mapFile = mapFiles[x];
+        try {
+            mapFile = Paths.get(mapFiles[x].toURI()).toFile();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        ;
     }
 
     public static void setPlayersNumber(int playersAmount) {
