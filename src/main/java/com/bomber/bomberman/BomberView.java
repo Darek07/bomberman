@@ -30,19 +30,21 @@ public class BomberView extends Group {
 	private final Image[] playersImages = new Image[PLAYERS_NUMBER];
 	private final Image unbreakableWallImage;
 	private final Image breakableWallImage;
+	private final Image emptyWallImage;
 	private final Image bombImage;
 	private final Image fireImage;
 	private final Image ripImage;
 
 	public BomberView() {
 		String base = "img/";
-		this.unbreakableWallImage = new Image(getClass().getResourceAsStream(base + "unbreakablewall.jpg"));
-		this.breakableWallImage = new Image(getClass().getResourceAsStream(base + "breakablewall.jpg"));
+		this.unbreakableWallImage = new Image(getClass().getResourceAsStream(base + "unbreakable1.png"));
+		this.breakableWallImage = new Image(getClass().getResourceAsStream(base + "breakable1.png"));
+		this.emptyWallImage = new Image(getClass().getResourceAsStream(base + "default1.png"));
 		this.bombImage = new Image(getClass().getResourceAsStream(base + "bomb.png"));
 		this.fireImage = new Image(getClass().getResourceAsStream(base + "fire.png"));
 		this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.png"));
 		for (int i = 0; i < PLAYERS_NUMBER; i++) {
-			this.playersImages[i] = new Image(getClass().getResourceAsStream(base + "player" + i + ".gif"));
+			this.playersImages[i] = new Image(getClass().getResourceAsStream(base + "player-" + (i+1) + ".png"));
 		}
 	}
 
@@ -108,6 +110,7 @@ public class BomberView extends Group {
 				switch (value) {
 					case BREAKABLEWALL -> this.cellViews[row][column].setImage(this.breakableWallImage);
 					case UNBREAKABLEWALL -> this.cellViews[row][column].setImage(this.unbreakableWallImage);
+					case EMPTY -> this.cellViews[row][column].setImage(this.emptyWallImage);
 					case BOMB -> this.cellViews[row][column].setImage(this.bombImage);
 					case FIRE -> this.cellViews[row][column].setImage(this.fireImage);
 					case RIP -> this.cellViews[row][column].setImage(this.ripImage);

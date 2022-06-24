@@ -202,4 +202,5 @@ public class StartWindowController implements Initializable {
 		Controller.setPlayerName(player2_name.getText(), 1);
 		Controller.setPlayerName(player3_name.getText(), 2);
 	}
+
 }

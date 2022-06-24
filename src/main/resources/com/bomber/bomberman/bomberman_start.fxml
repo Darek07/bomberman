@@ -66,21 +66,21 @@
                <graphic>
                   <ImageView fx:id="image_map1" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@map1.jpg" />
+                        <Image url="@map1.png" />
                      </image></ImageView>
                </graphic></MenuItem>
           <MenuItem fx:id="map2" mnemonicParsing="false" text="MAP 2">
                <graphic>
                   <ImageView fx:id="image_map2" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@map2.jpg" />
+                        <Image url="@map2.png" />
                      </image></ImageView>
                </graphic></MenuItem>
             <MenuItem fx:id="map3" mnemonicParsing="false" text="MAP 3">
                <graphic>
                   <ImageView fx:id="image_map3" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@map3.jpg" />
+                        <Image url="@map3.png" />
                      </image></ImageView>
                </graphic>
             </MenuItem>
