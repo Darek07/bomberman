@@ -32,6 +32,7 @@ import java.util.ResourceBundle;
 public class Controller extends Thread implements EventHandler<KeyEvent>, Initializable {
     public static int PLAYERS_NUMBER = 3;
     private static File mapFile;
+    private static int mapIndex;
     private static int roundsNumber;
     private static int roundTimeSec;
     private static final String[] playersNames = new String[PLAYERS_NUMBER];
@@ -49,8 +50,11 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
     private AnimationTimer animationTimer;
     private boolean isPaused;
 
-    public static final URL[] mapFiles = { Controller.class.getResource("map.txt") };
-    public static final KeyCode[] PLAYER0KEYS = { KeyCode.LEFT, KeyCode.RIGHT, KeyCode.DOWN, KeyCode.UP, KeyCode.SLASH };
+    public static final URL[] mapFiles = {
+            Controller.class.getResource("map.txt"),
+            Controller.class.getResource("map.txt"),
+            Controller.class.getResource("map.txt")};
+    public static final KeyCode[] PLAYER0KEYS = { KeyCode.LEFT, KeyCode.RIGHT, KeyCode.DOWN, KeyCode.UP, KeyCode.SHIFT };
     public static final KeyCode[] PLAYER1KEYS = { KeyCode.A, KeyCode.D, KeyCode.S, KeyCode.W, KeyCode.TAB };
     public static final KeyCode[] PLAYER2KEYS = { KeyCode.H, KeyCode.K, KeyCode.J, KeyCode.U, KeyCode.SPACE };
     public static final Set<KeyCode> LEFT_KEYS;
@@ -241,16 +245,20 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
         return mapFile;
     }
 
+    public static int getMapIndex() {
+        return mapIndex;
+    }
+
     public static void setMapFile(int x) {
         if (x < 0 || x >= mapFiles.length) {
             throw new NullPointerException();
         }
         try {
             mapFile = Paths.get(mapFiles[x].toURI()).toFile();
+            mapIndex = x;
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        ;
     }
 
     public static void setPlayersNumber(int playersAmount) {

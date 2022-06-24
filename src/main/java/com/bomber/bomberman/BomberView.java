@@ -37,9 +37,10 @@ public class BomberView extends Group {
 
 	public BomberView() {
 		String base = "img/";
-		this.unbreakableWallImage = new Image(getClass().getResourceAsStream(base + "unbreakable1.png"));
-		this.breakableWallImage = new Image(getClass().getResourceAsStream(base + "breakable1.png"));
-		this.emptyWallImage = new Image(getClass().getResourceAsStream(base + "default1.png"));
+		int mapIndex = Controller.getMapIndex() + 1;
+		this.unbreakableWallImage = new Image(getClass().getResourceAsStream(base + "unbreakable" + mapIndex + ".png"));
+		this.breakableWallImage = new Image(getClass().getResourceAsStream(base + "breakable" + mapIndex + ".png"));
+		this.emptyWallImage = new Image(getClass().getResourceAsStream(base + "default" + mapIndex + ".png"));
 		this.bombImage = new Image(getClass().getResourceAsStream(base + "bomb.png"));
 		this.fireImage = new Image(getClass().getResourceAsStream(base + "fire.png"));
 		this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.png"));
