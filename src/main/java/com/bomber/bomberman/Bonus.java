@@ -41,7 +41,6 @@ public class Bonus {
 			int col = (int)point.getX() / CELL_SIZE;
 			int row = (int)point.getY() / CELL_SIZE;
 			CellValue cellValue = bomberModel.getCellValue(row, col);
-			System.out.println(cellValue);
 			if (cellValue == CellValue.SPEED_BONUS) {
 				bomberModel.setCellValue(CellValue.EMPTY, row, col);
 				player.increaseSpeed();
