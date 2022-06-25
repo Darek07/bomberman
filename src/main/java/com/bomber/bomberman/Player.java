@@ -30,7 +30,7 @@ public class Player extends AnimationTimer {
 		this.name = Controller.getPlayerName(playerID);
 		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
 		this.playerInitialLocation = this.playerLocation;
-		this.playerSpeed = 2;
+		this.playerSpeed = 10;
 		this.playerInitialSpeed = this.playerSpeed;
 		this.playerDirection = Direction.NONE;
 		this.isMoving = false;
@@ -45,7 +45,7 @@ public class Player extends AnimationTimer {
 			return;
 		}
 		final double elapsedMilliSeconds = (now - lastUpdateTime) / 1_000_000.0 ;
-		if (elapsedMilliSeconds >= playerSpeed) {
+		if (elapsedMilliSeconds >= 10) {
 			movePlayer();
 			lastUpdateTime = now;
 		}
@@ -56,9 +56,11 @@ public class Player extends AnimationTimer {
 			return;
 		}
 
-		Point2D newLocation = this.playerLocation.add(playerDirection.velocity);
+		Point2D velocitySpeed = playerDirection.velocity.multiply((float)playerSpeed / 10);
+		Point2D newLocation = this.playerLocation.add(velocitySpeed);
 		if (!isLocationCollide(newLocation)) {
 			this.playerLocation = newLocation;
+			Bonus.isPlayerPickBonus(model, this);
 		}
 		checkIsInsideBomb();
 	}
@@ -80,8 +82,8 @@ public class Player extends AnimationTimer {
 		int row = (int)point.getY() / CELL_SIZE;
 		return switch (model.getCellValue(row, col)) {
 			case BOMB -> !isInsideBomb;
-			case UNBREAKABLEWALL, BREAKABLEWALL -> true;
-			case EMPTY, FIRE, RIP -> false;
+			case UNBREAKABLE_WALL, BREAKABLE_WALL -> true;
+			case EMPTY, FIRE, RIP, SPEED_BONUS -> false;
 		};
 	}
 
@@ -171,5 +173,10 @@ public class Player extends AnimationTimer {
 			increaseDies();
 			this.stop();
 		}
+	}
+
+	public void increaseSpeed() {
+		this.playerSpeed++;
+		if (this.playerSpeed > 25) this.playerSpeed = 25;
 	}
 }

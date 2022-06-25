@@ -14,7 +14,7 @@ public class Bomb extends Thread {
 	private final Player player;
 	private Point2D location;
 	private int distance;
-	private AnimationTimer fireClock;
+	private final AnimationTimer fireClock;
 	private volatile boolean isFire;
 
 	public Bomb(BomberModel bomberModel, Player player) {
@@ -56,11 +56,13 @@ public class Bomb extends Thread {
 
 	@Override
 	public void run() {
-		putBomb();
 		try {
+			putBomb();
 			Thread.sleep(3000);
 			boom();
 			fireClock.start();
+		} catch (NullPointerException n) {
+			System.out.println("Bomb has already been set");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -71,6 +73,9 @@ public class Bomb extends Thread {
 		distance = player.getFireDistance();
 		int row = (int)location.getY() / BomberView.CELL_SIZE;
 		int col = (int)location.getX() / BomberView.CELL_SIZE;
+		if (bomberModel.getCellValue(row, col) == CellValue.BOMB) {
+			throw new NullPointerException();
+		}
 		bomberModel.setCellValue(CellValue.BOMB, row, col);
 		player.setIsInsideBomb();
 	}
@@ -92,11 +97,11 @@ public class Bomb extends Thread {
 				int row = (int) position.getY();
 				int col = (int) position.getX();
 				CellValue cellValue = bomberModel.getCellValue(row, col);
-				if (cellValue == null || cellValue == CellValue.UNBREAKABLEWALL) {
+				if (cellValue == null || cellValue == CellValue.UNBREAKABLE_WALL) {
 					toDelete.add(key);
 				}
-				else if (cellValue == CellValue.BREAKABLEWALL) {
-					bomberModel.setCellValue(CellValue.EMPTY, row, col);
+				else if (cellValue == CellValue.BREAKABLE_WALL || cellValue == CellValue.SPEED_BONUS) {
+					Bonus.randomBonus(bomberModel, row, col);
 					toDelete.add(key);
 				} else if (cellValue == CellValue.EMPTY) {
 					bomberModel.setCellValue(CellValue.FIRE, row, col);
