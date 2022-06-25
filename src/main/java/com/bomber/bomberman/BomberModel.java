@@ -52,8 +52,8 @@ public class BomberModel {
             for (int column = 0; column < line.length(); column++){
                 CellValue cell;
                 switch (line.charAt(column)) {
-                    case '#' -> cell = CellValue.UNBREAKABLEWALL;
-                    case '&' -> cell = CellValue.BREAKABLEWALL;
+                    case '#' -> cell = CellValue.UNBREAKABLE_WALL;
+                    case '&' -> cell = CellValue.BREAKABLE_WALL;
                     case 'P' -> {
                         cell = CellValue.EMPTY;
                         if (alivePlayers.size() < Controller.PLAYERS_NUMBER) {
@@ -112,7 +112,9 @@ public class BomberModel {
     }
 
     public void setBomb(Player player) {
-        new Bomb(this, player);
+        if (player.getPlayerActiveBombs() < player.getPlayerMaxActiveBombs()) {
+            new Bomb(this, player);
+        }
     }
 
     public void setPlayerMove(Player player, Direction direction, boolean isMove) {
