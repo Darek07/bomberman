@@ -46,8 +46,8 @@ public class BomberView extends Group {
 		this.bombImage = new Image(getClass().getResourceAsStream(base + "bomb.png"));
 		this.fireImage = new Image(getClass().getResourceAsStream(base + "fire.png"));
 		this.ripImage = new Image(getClass().getResourceAsStream(base + "rip.png"));
-		this.speedBonusImage = new Image(getClass().getResourceAsStream(base + "player0.gif"));
-		this.bombBonusImage = new Image(getClass().getResourceAsStream(base + "player1.gif"));
+		this.speedBonusImage = new Image(getClass().getResourceAsStream(base + "Speed_Bonus.png"));
+		this.bombBonusImage = new Image(getClass().getResourceAsStream(base + "Bomb_A.png"));
 		for (int i = 0; i < PLAYERS_NUMBER; i++) {
 			this.playersImages[i] = new Image(getClass().getResourceAsStream(base + "player-" + (i+1) + ".png"));
 		}
