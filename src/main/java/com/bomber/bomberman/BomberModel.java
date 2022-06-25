@@ -83,7 +83,6 @@ public class BomberModel {
             }
         });
         this.alivePlayers.removeAll(ripPlayers);
-        System.out.println(this.ripPlayers.size());
     }
 
     public void restoreData() {

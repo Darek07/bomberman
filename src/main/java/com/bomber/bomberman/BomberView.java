@@ -53,6 +53,7 @@ public class BomberView extends Group {
 		if (this.rowCount <= 0 || this.columnCount <= 0) {
 			return;
 		}
+		this.initializeBackground();
 		this.cellViews = new ImageView[this.rowCount][this.columnCount];
 		for (int row = 0; row < this.rowCount; row++) {
 			for (int column = 0; column < this.columnCount; column++) {
@@ -62,6 +63,19 @@ public class BomberView extends Group {
 				imageView.setFitWidth(CELL_SIZE);
 				imageView.setFitHeight(CELL_SIZE);
 				this.cellViews[row][column] = imageView;
+				this.getChildren().add(imageView);
+			}
+		}
+	}
+
+	private void initializeBackground() {
+		for (int row = 0; row < this.rowCount; row++) {
+			for (int column = 0; column < this.columnCount; column++) {
+				ImageView imageView = new ImageView(this.emptyWallImage);
+				imageView.setX(column * CELL_SIZE);
+				imageView.setY(row * CELL_SIZE);
+				imageView.setFitWidth(CELL_SIZE);
+				imageView.setFitHeight(CELL_SIZE);
 				this.getChildren().add(imageView);
 			}
 		}
@@ -111,7 +125,6 @@ public class BomberView extends Group {
 				switch (value) {
 					case BREAKABLEWALL -> this.cellViews[row][column].setImage(this.breakableWallImage);
 					case UNBREAKABLEWALL -> this.cellViews[row][column].setImage(this.unbreakableWallImage);
-					case EMPTY -> this.cellViews[row][column].setImage(this.emptyWallImage);
 					case BOMB -> this.cellViews[row][column].setImage(this.bombImage);
 					case FIRE -> this.cellViews[row][column].setImage(this.fireImage);
 					case RIP -> this.cellViews[row][column].setImage(this.ripImage);
