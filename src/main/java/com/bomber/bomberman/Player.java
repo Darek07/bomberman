@@ -11,14 +11,17 @@ public class Player extends AnimationTimer {
 	private final BomberModel model;
 	private final Point2D playerInitialLocation;
 	private final Integer playerInitialSpeed;
+	private final Integer initialMaxActiveBombs;
 	private Point2D playerLocation;
 	private Integer playerSpeed;
 	private Direction playerDirection;
+	private Integer playerMaxActiveBombs;
+	private Integer playerActiveBombs;
 	private boolean isMoving;
 	private boolean isInsideBomb;
-	private boolean isDied = false;
-	private int fireDistance = 3;
-	private long lastUpdateTime = 0;
+	private boolean isDied;
+	private int fireDistance;
+	private long lastUpdateTime;
 	private int dies = 0;
 	private int wins = 0;
 
@@ -28,13 +31,10 @@ public class Player extends AnimationTimer {
 		this.model = model;
 		this.playerID = playerID;
 		this.name = Controller.getPlayerName(playerID);
-		this.playerLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
-		this.playerInitialLocation = this.playerLocation;
-		this.playerSpeed = 10;
-		this.playerInitialSpeed = this.playerSpeed;
-		this.playerDirection = Direction.NONE;
-		this.isMoving = false;
-		this.isInsideBomb = false;
+		this.playerInitialLocation = new Point2D(col * BomberView.CELL_SIZE, row * BomberView.CELL_SIZE);
+		this.playerInitialSpeed = 10;
+		this.initialMaxActiveBombs = 1;
+		restoreInitialValues();
 		start();
 	}
 
@@ -83,7 +83,7 @@ public class Player extends AnimationTimer {
 		return switch (model.getCellValue(row, col)) {
 			case BOMB -> !isInsideBomb;
 			case UNBREAKABLE_WALL, BREAKABLE_WALL -> true;
-			case EMPTY, FIRE, RIP, SPEED_BONUS -> false;
+			case EMPTY, FIRE, RIP, SPEED_BONUS, BOMB_BONUS -> false;
 		};
 	}
 
@@ -110,7 +110,9 @@ public class Player extends AnimationTimer {
 
 	public void restoreInitialValues() {
 		playerLocation = playerInitialLocation;
-		playerSpeed = this.playerInitialSpeed;
+		playerSpeed = playerInitialSpeed;
+		playerMaxActiveBombs = initialMaxActiveBombs;
+		playerActiveBombs = 0;
 		playerDirection = Direction.NONE;
 		isMoving = false;
 		isInsideBomb = false;
@@ -178,5 +180,25 @@ public class Player extends AnimationTimer {
 	public void increaseSpeed() {
 		this.playerSpeed++;
 		if (this.playerSpeed > 25) this.playerSpeed = 25;
+	}
+
+	public Integer getPlayerMaxActiveBombs() {
+		return playerMaxActiveBombs;
+	}
+
+	public void increaseMaxActiveBombs() {
+		this.playerMaxActiveBombs++;
+	}
+
+	public Integer getPlayerActiveBombs() {
+		return playerActiveBombs;
+	}
+
+	public void increaseActiveBombs() {
+		this.playerActiveBombs++;
+	}
+
+	public void decreaseActiveBombs() {
+		this.playerActiveBombs--;
 	}
 }

@@ -78,6 +78,7 @@ public class Bomb extends Thread {
 		}
 		bomberModel.setCellValue(CellValue.BOMB, row, col);
 		player.setIsInsideBomb();
+		player.increaseActiveBombs();
 	}
 
 	public void boom() {
@@ -121,6 +122,7 @@ public class Bomb extends Thread {
 			);
 		}
 		isFire = true;
+		player.decreaseActiveBombs();
 	}
 
 	private void endBoom() {

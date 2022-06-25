@@ -112,7 +112,9 @@ public class BomberModel {
     }
 
     public void setBomb(Player player) {
-        new Bomb(this, player);
+        if (player.getPlayerActiveBombs() < player.getPlayerMaxActiveBombs()) {
+            new Bomb(this, player);
+        }
     }
 
     public void setPlayerMove(Player player, Direction direction, boolean isMove) {

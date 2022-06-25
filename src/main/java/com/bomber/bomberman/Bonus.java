@@ -8,10 +8,15 @@ import static com.bomber.bomberman.BomberView.PLAYER_SIZE;
 public class Bonus {
 
 	private static final CellValue[] randomValues = {
-			CellValue.EMPTY,
 			CellValue.SPEED_BONUS,
 			CellValue.EMPTY,
 			CellValue.EMPTY,
+			CellValue.BOMB_BONUS,
+			CellValue.EMPTY,
+			CellValue.SPEED_BONUS,
+			CellValue.BOMB_BONUS,
+			CellValue.EMPTY,
+			CellValue.BOMB_BONUS,
 			CellValue.SPEED_BONUS };
 
 	public static void randomBonus(BomberModel bomberModel, int row, int column) {
@@ -40,6 +45,11 @@ public class Bonus {
 			if (cellValue == CellValue.SPEED_BONUS) {
 				bomberModel.setCellValue(CellValue.EMPTY, row, col);
 				player.increaseSpeed();
+				return true;
+			}
+			if (cellValue == CellValue.BOMB_BONUS) {
+				bomberModel.setCellValue(CellValue.EMPTY, row, col);
+				player.increaseMaxActiveBombs();
 				return true;
 			}
 		}
