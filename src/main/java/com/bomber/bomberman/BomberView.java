@@ -99,7 +99,7 @@ public class BomberView extends Group {
 
 	public void initializeInfo() {
 		this.labels.setPrefHeight(PLAYERS_NUMBER * labels.getPrefHeight() + labels.getPadding().getBottom());
-		this.bottomLabel.setText("Next round: Enter / New game: R\nMove: arrow keys / WASD / UHJK\nBomb: Slash TAB Space");
+		this.bottomLabel.setText("Next round: Enter / New game: R\t\tMove: arrow keys / WASD / UHJK\t\tBomb: Shift TAB Space");
 	}
 
 	public void updatePlayersViews(BomberModel bomberModel) {

@@ -102,7 +102,7 @@ public class BomberModel {
     }
 
     public boolean isAnyBombAppears() {
-        return Arrays.stream(grid).flatMap(Arrays::stream).anyMatch(cell -> cell == CellValue.RIP || cell == CellValue.FIRE);
+        return Arrays.stream(grid).flatMap(Arrays::stream).anyMatch(cell -> cell == CellValue.BOMB || cell == CellValue.RIP || cell == CellValue.FIRE);
     }
 
     public Player getWinner() {

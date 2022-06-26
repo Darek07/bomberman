@@ -135,7 +135,7 @@ public class StartWindowController implements Initializable {
 
 			Scene scene = new Scene(root, sceneWidth, sceneHeight);
 			stage.setScene(scene);
-			stage.setResizable(false);
+			stage.setFullScreen(true);
 			stage.show();
 			root.requestFocus();
 		} catch (IOException error) {
