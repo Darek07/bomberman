@@ -166,7 +166,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
 
 		keyEvent.consume();
 		Player player = getPlayerByKey(keyCode);
-		if (player == null || player.isDied()) {
+		if (player == null || player.isDied() || isPaused) {
 			return;
 		}
 		if (bombKey) {
