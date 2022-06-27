@@ -16,11 +16,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Kontroler okna początkowego
+ */
 public class StartWindowController implements Initializable {
 
-	public static final int secondsPerMinute = 60;
+	private static final int secondsPerMinute = 60;
 	@FXML
-	public Button submitButton;
+	private Button submitButton;
 	//    ----------vor-o-na-----------
 	@FXML
 	private SplitMenuButton choose_map;
@@ -96,6 +99,9 @@ public class StartWindowController implements Initializable {
 
 	private final ToggleGroup toggleGroup = new ToggleGroup();
 
+	/**
+	 * Inicjalizacja okna początkowego przez Javafx
+	 */
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		sl_rounds.valueProperty().addListener((observable, oldValue, newValue) -> {

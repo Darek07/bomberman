@@ -14,8 +14,17 @@ import java.util.concurrent.TimeUnit;
 
 import static com.bomber.bomberman.Controller.PLAYERS_NUMBER;
 
+/**
+ * BomberView w czasie rozgrywki aktualizuje widok
+ */
 public class BomberView extends Group {
+	/**
+	 * Rozmiar komórki
+	 */
 	public final static int CELL_SIZE = 40;
+	/**
+	 * Rozmiar gracza
+	 */
 	public final static int PLAYER_SIZE = 27;
 
 	@FXML private int rowCount;
@@ -37,6 +46,9 @@ public class BomberView extends Group {
 	private final Image speedBonusImage;
 	private final Image bombBonusImage;
 
+	/**
+	 * Inicjalizacja wykorzystywanych w czasie rozrywki zdjęć. Kontroler powinien mieć zainicjalizowany indeks mapy
+	 */
 	public BomberView() {
 		String base = "img/";
 		int mapIndex = Controller.getMapIndex() + 1;
@@ -85,6 +97,9 @@ public class BomberView extends Group {
 		}
 	}
 
+	/**
+	 * Inicjalizacja widoków wszystkich graczy. Kotroler powinien być zainicjalizowany
+	 */
 	public void initializePlayersViews() {
 		playersViews.forEach(playerView -> playerView.setImage(null));
 		playersViews.clear();
@@ -97,11 +112,18 @@ public class BomberView extends Group {
 		this.getChildren().addAll(playersViews);
 	}
 
+	/**
+	 * Inicjalizacja aktualnej informacji o grze. Kotroler powinien być zainicjalizowany
+	 */
 	public void initializeInfo() {
 		this.labels.setPrefHeight(PLAYERS_NUMBER * labels.getPrefHeight() + labels.getPadding().getBottom());
 		this.bottomLabel.setText("Next round: Enter / New game: R\t\tMove: arrow keys / WASD / UHJK\t\tBomb: Shift TAB Space");
 	}
 
+	/**
+	 * Aktualizuje widoki graczy
+	 * @param bomberModel BomberModel wykorzystywany w grze
+	 */
 	public void updatePlayersViews(BomberModel bomberModel) {
 		if (playersViews.size() != PLAYERS_NUMBER) {
 			initializePlayersViews();
@@ -119,6 +141,10 @@ public class BomberView extends Group {
 		}
 	}
 
+	/**
+	 * Aktualizuje widok planszy
+	 * @param bomberModel BomberModel wykorzystywany w grze
+	 */
 	public void updateGridViews(BomberModel bomberModel) {
 		if (bomberModel.getRowCount() != this.rowCount || bomberModel.getColumnCount() != this.columnCount) {
 			return;
@@ -140,6 +166,11 @@ public class BomberView extends Group {
 		}
 	}
 
+	/**
+	 * Aktualizuje aktualną informację o grze
+	 * @param bomberModel BomberModel wykorzystywany w grze
+	 * @param currentRound aktualna runda
+	 */
 	public void updateInfo(BomberModel bomberModel, int currentRound) {
 		StringBuilder format = new StringBuilder();
 		Player player;
@@ -155,6 +186,10 @@ public class BomberView extends Group {
 		this.roundsLabel.setText(String.format("Round: %d", currentRound));
 	}
 
+	/**
+	 * Aktualizuje widok aktualnego czasu rundy (mm:ss)
+	 * @param milliSeconds aktualny czas rundy
+	 */
 	public void updateTimeLabel(long milliSeconds) {
 		String txt = String.format("%02d:%02d",
 				TimeUnit.MILLISECONDS.toMinutes(milliSeconds) -
@@ -164,46 +199,84 @@ public class BomberView extends Group {
 		this.timeLabel.setText(txt);
 	}
 
+	/**
+	 * Wyświetla informację o końcu rundy lub gry
+	 * @param winner zwycięzca gry lub null w przypadku kontynuacji rozgrywki
+	 */
 	public void endInfo(String winner) {
 		this.timeLabel.setText(winner == null
 						? "Press Enter to start next round"
 						: String.format("WINNER %s.\nPress R to restart the game", winner));
 	}
 
+	/**
+	 * @return liczbę wierszy
+	 */
 	public int getRowCount() {
 		return this.rowCount;
 	}
 
+	/**
+	 * Inicjalizacji planszy w przypadku już podanych wartości wierszy oraz kolumn
+	 * @param rowCount liczba wierszy
+	 */
 	public void setRowCount(int rowCount) {
 		this.rowCount = rowCount;
 		this.initializeGrid();
 	}
 
+	/**
+	 * @return liczbę kolumn
+	 */
 	public int getColumnCount() {
 		return this.columnCount;
 	}
 
+	/**
+	 * Inicjalizacji planszy w przypadku już podanych wartości wierszy oraz kolumn
+	 * @param columnCount liczba kolumn
+	 */
 	public void setColumnCount(int columnCount) {
 		this.columnCount = columnCount;
 		this.initializeGrid();
 	}
 
+	/**
+	 * Inicjalizacja Javafx Label dla aktualnej informacji o rozgrywce. Wywoływany w Controller
+	 * @param labels Javafx Label
+	 */
 	public void setLabels(BorderPane labels) {
 		this.labels = labels;
 	}
 
+	/**
+	 * Inicjalizacja Javafx Label dla informacji o graczach. Wywoływany w Controller
+	 * @param playersLabel Javafx Label players
+	 */
 	public void setPlayersLabel(Label playersLabel) {
 		this.playersLabel = playersLabel;
 	}
 
+	/**
+	 * Inicjalizacja Javafx Label dla informacji o rundzie. Wywoływany w Controller
+	 * @param roundsLabel Javafx Label rounds
+	 */
 	public void setRoundsLabel(Label roundsLabel) {
 		this.roundsLabel = roundsLabel;
 	}
 
+	/**
+	 * Inicjalizacja Javafx Label dla informacji o czasie rundy. Wywoływany w Controller
+	 * @param timeLabel Javafx Label time
+	 */
 	public void setTimeLabel(Label timeLabel) {
 		this.timeLabel = timeLabel;
 	}
 
+	/**
+	 * Inicjalizacja Javafx Label dla informacji o klawiszach używanych w rozgrywce. Wywoływany w Controller
+	 * @param bottomLabel Javafx Label bottom
+	 */
 	public void setBottomLabel(Label bottomLabel) {
 		this.bottomLabel = bottomLabel;
 	}

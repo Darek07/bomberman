@@ -2,8 +2,31 @@ package com.bomber.bomberman;
 
 import javafx.geometry.Point2D;
 
+/**
+ * Kierunek ruchu
+ */
 public enum Direction {
-	UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0), NONE(0, 0);
+	/**
+	 * W górę
+	 */
+	UP(0, -1),
+	/**
+	 * W prawo
+	 */
+	RIGHT(1, 0),
+	/**
+	 * W dół
+	 */
+	DOWN(0, 1),
+	/**
+	 * W lewo
+	 */
+	LEFT(-1, 0),
+	/**
+	 * Żaden
+	 */
+	NONE(0, 0);
+
 	final Point2D velocity;
 
 	Direction(int x, int y) {

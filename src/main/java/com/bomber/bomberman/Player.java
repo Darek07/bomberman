@@ -6,6 +6,9 @@ import javafx.geometry.Point2D;
 import static com.bomber.bomberman.BomberView.PLAYER_SIZE;
 import static com.bomber.bomberman.BomberView.CELL_SIZE;
 
+/**
+ * Klasa reprezentująca gracza. Przechowywane są dane o graczu. Umożliwienie poruszania się po planszy
+ */
 public class Player extends AnimationTimer {
 	private final int playerID;
 	private final BomberModel model;
@@ -27,6 +30,14 @@ public class Player extends AnimationTimer {
 
 	private final String name;
 
+	/**
+	 * Tworzenie gracza
+	 *
+	 * @param model    BomberModel wykorzystywany w grze
+	 * @param playerID id gracza
+	 * @param col      początkowa kolumna gracza na planszy
+	 * @param row      początkowy wiersz gracza na planszy
+	 */
 	public Player(BomberModel model, int playerID, int col, int row) {
 		this.model = model;
 		this.playerID = playerID;
@@ -38,25 +49,31 @@ public class Player extends AnimationTimer {
 		start();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handle(long now) {
 		if (lastUpdateTime == 0 || lastUpdateTime >= now) {
 			lastUpdateTime = now;
 			return;
 		}
-		final double elapsedMilliSeconds = (now - lastUpdateTime) / 1_000_000.0 ;
+		final double elapsedMilliSeconds = (now - lastUpdateTime) / 1_000_000.0;
 		if (elapsedMilliSeconds >= 10) {
 			movePlayer();
 			lastUpdateTime = now;
 		}
 	}
 
+	/**
+	 * Ruch gracza w kierunku wskazanym przez Controller oraz zgodnym z zasadami gry
+	 */
 	public void movePlayer() {
 		if (!isMoving) {
 			return;
 		}
 
-		Point2D velocitySpeed = playerDirection.velocity.multiply((float)playerSpeed / 10);
+		Point2D velocitySpeed = playerDirection.velocity.multiply((float) playerSpeed / 10);
 		Point2D newLocation = this.playerLocation.add(velocitySpeed);
 		if (!isLocationCollide(newLocation)) {
 			this.playerLocation = newLocation;
@@ -78,8 +95,8 @@ public class Player extends AnimationTimer {
 	}
 
 	private boolean isPointCollide(Point2D point) {
-		int col = (int)point.getX() / CELL_SIZE;
-		int row = (int)point.getY() / CELL_SIZE;
+		int col = (int) point.getX() / CELL_SIZE;
+		int row = (int) point.getY() / CELL_SIZE;
 		return switch (model.getCellValue(row, col)) {
 			case BOMB -> !isInsideBomb;
 			case UNBREAKABLE_WALL, BREAKABLE_WALL -> true;
@@ -95,11 +112,17 @@ public class Player extends AnimationTimer {
 		isInsideBomb = false;
 		isInsideBomb =
 				isPointCollide(playerLocation) ||
-				isPointCollide(playerLocation.add(PLAYER_SIZE, 0)) ||
-				isPointCollide(playerLocation.add(PLAYER_SIZE, PLAYER_SIZE)) ||
-				isPointCollide(playerLocation.add(0, PLAYER_SIZE));
+						isPointCollide(playerLocation.add(PLAYER_SIZE, 0)) ||
+						isPointCollide(playerLocation.add(PLAYER_SIZE, PLAYER_SIZE)) ||
+						isPointCollide(playerLocation.add(0, PLAYER_SIZE));
 	}
 
+	/**
+	 * Ustawienie, czy gracz może się poruszać i w jakim kierunku
+	 *
+	 * @param direction kierunek ruchu
+	 * @param move      jeżeli true, to gracz może się poruszać, w przeciwnym razie nie
+	 */
 	public void setPlayerDirectionAndMove(Direction direction, boolean move) {
 		if (this.isMoving && !move && this.playerDirection != direction) {
 			return;
@@ -108,6 +131,9 @@ public class Player extends AnimationTimer {
 		this.isMoving = move;
 	}
 
+	/**
+	 * Wznowienie początkowych danych gracza, aby rozpocząć kolejną rundę
+	 */
 	public void restoreInitialValues() {
 		playerLocation = playerInitialLocation;
 		playerSpeed = playerInitialSpeed;
@@ -122,50 +148,79 @@ public class Player extends AnimationTimer {
 		this.start();
 	}
 
+	/**
+	 * Ustawianie flagi, że gracz znajduję się wewnątrz bomby. Metoda jest wywoływana gdy gracz umieszcza bombe na planszy
+	 */
 	public void setIsInsideBomb() {
 		isInsideBomb = true;
 	}
 
+	/**
+	 * @return pozycję gracza na planszy
+	 */
 	public Point2D getPlayerLocation() {
 		return playerLocation;
 	}
 
+	/**
+	 * @return odległość ognia umieszczonej przez gracza bomby
+	 */
 	public int getFireDistance() {
 		return fireDistance;
 	}
 
-	public void setFireDistance(int fireDistance) {
-		this.fireDistance = fireDistance;
-	}
-
+	/**
+	 * @return id gracza
+	 */
 	public int getPlayerID() {
 		return playerID;
 	}
 
+	/**
+	 * @return imię gracza
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @return ilość przegranych rund
+	 */
 	public int getDies() {
 		return dies;
 	}
 
+	/**
+	 * Zwiększenie o jeden liczby rund przegranych przez gracza
+	 */
 	public void increaseDies() {
 		this.dies++;
 	}
 
+	/**
+	 * @return ilość wygranych rund
+	 */
 	public int getWins() {
 		return wins;
 	}
 
+	/**
+	 * Zwiększenie o jeden liczby rund wygranych przez gracza
+	 */
 	public void increaseWins() {
 		this.wins++;
 	}
 
+	/**
+	 * @return czy gracz żyje
+	 */
 	public boolean isDied() {
 		return isDied;
 	}
 
+	/**
+	 * @param died true - zwiększyć ilość przegranych rund oraz zatrzymać ruch, false - gracz żyje
+	 */
 	public void setDied(boolean died) {
 		if (this.isDied == died) {
 			return;
@@ -177,27 +232,45 @@ public class Player extends AnimationTimer {
 		}
 	}
 
+	/**
+	 * Zwiększenie prędkości gracza
+	 */
 	public void increaseSpeed() {
 		this.playerSpeed++;
 		if (this.playerSpeed > 25) this.playerSpeed = 25;
 	}
 
+	/**
+	 * @return maksymalną ilość aktywnych bomb, które może postawić gracz
+	 */
 	public Integer getPlayerMaxActiveBombs() {
 		return playerMaxActiveBombs;
 	}
 
+	/**
+	 * Zwiększenie maksymalnej ilości aktywnych bomb, które może postawić gracz
+	 */
 	public void increaseMaxActiveBombs() {
 		this.playerMaxActiveBombs++;
 	}
 
+	/**
+	 * @return ilość postawionych bomb, które są nadal aktywne
+	 */
 	public Integer getPlayerActiveBombs() {
 		return playerActiveBombs;
 	}
 
+	/**
+	 * Zwiększenie ilości postawionych graczem bomb
+	 */
 	public void increaseActiveBombs() {
 		this.playerActiveBombs++;
 	}
 
+	/**
+	 * Zmiejszenie ilości postawionych graczem bomb
+	 */
 	public void decreaseActiveBombs() {
 		this.playerActiveBombs--;
 	}

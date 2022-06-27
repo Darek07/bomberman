@@ -5,11 +5,23 @@ import javafx.geometry.Point2D;
 
 import java.util.*;
 
+/**
+ * Klasa reprezentująca bombę
+ */
 public class Bomb extends AnimationTimer {
 
+	/**
+	 * {@value #BOMB_WAIT_MS} (ms) bomba stoi i czeka przed wybuchem
+	 */
 	public static final int BOMB_WAIT_MS = 3000;
+	/**
+	 * {@value #BOMB_FIRE_MS} (ms) trwa wybuch
+	 */
 	public static final int BOMB_FIRE_MS = 1000;
-	public static final int RIP_MS = 3000;
+	/**
+	 * {@value #RIP_MS} (ms) trwa animacja, kiedy gracz został pochłonięty bombą
+	 */
+	public static final int RIP_MS = 2000;
 
 	private final Set<Point2D> firePositions = new HashSet<>(9);
 	private final List<Player> hitPlayers = new ArrayList<>(Controller.PLAYERS_NUMBER);
@@ -22,6 +34,12 @@ public class Bomb extends AnimationTimer {
 	private long lastTime = 0;
 	private Timer wait;
 
+	/**
+	 * Tworzenie bomby
+	 *
+	 * @param bomberModel BomberModel wykorzystywany w grze
+	 * @param player      gracz, który umieścił bombę
+	 */
 	public Bomb(BomberModel bomberModel, Player player) {
 		this.bomberModel = bomberModel;
 		this.player = player;
@@ -52,6 +70,9 @@ public class Bomb extends AnimationTimer {
 		}, BOMB_FIRE_MS + BOMB_WAIT_MS);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handle(long now) {
 		if (lastTime == 0) {
@@ -78,11 +99,14 @@ public class Bomb extends AnimationTimer {
 		lastTime = now;
 	}
 
+	/**
+	 * Umieszcza bombę na pozycji gracza, ustawiając flagę gracza, że jest wewnątrz bomby oraz zwiekszająć ilość aktywnych bomb gracza
+	 */
 	public void putBomb() {
 		location = player.getPlayerLocation();
 		distance = player.getFireDistance();
-		int row = (int)location.getY() / BomberView.CELL_SIZE;
-		int col = (int)location.getX() / BomberView.CELL_SIZE;
+		int row = (int) location.getY() / BomberView.CELL_SIZE;
+		int col = (int) location.getX() / BomberView.CELL_SIZE;
 		if (bomberModel.getCellValue(row, col) == CellValue.BOMB) {
 			throw new NullPointerException();
 		}
@@ -91,9 +115,9 @@ public class Bomb extends AnimationTimer {
 		player.increaseActiveBombs();
 	}
 
-	public void boom() {
-		int initRow = (int)location.getY() / BomberView.CELL_SIZE;
-		int initCol = (int)location.getX() / BomberView.CELL_SIZE;
+	private void boom() {
+		int initRow = (int) location.getY() / BomberView.CELL_SIZE;
+		int initCol = (int) location.getX() / BomberView.CELL_SIZE;
 
 		Map<Direction, Point2D> firePositions = new HashMap<>(4);
 		List<Direction> fireDirectionNotAllowed = new ArrayList<>(4);
@@ -111,8 +135,7 @@ public class Bomb extends AnimationTimer {
 				CellValue cellValue = bomberModel.getCellValue(row, col);
 				if (cellValue == null || cellValue == CellValue.UNBREAKABLE_WALL) {
 					fireDirectionNotAllowed.add(key);
-				}
-				else if (cellValue == CellValue.BREAKABLE_WALL || cellValue == CellValue.SPEED_BONUS) {
+				} else if (cellValue == CellValue.BREAKABLE_WALL || cellValue == CellValue.SPEED_BONUS) {
 					Bonus.randomBonus(bomberModel, row, col);
 					fireDirectionNotAllowed.add(key);
 				} else if (cellValue == CellValue.EMPTY || cellValue == CellValue.BOMB) {
@@ -124,13 +147,13 @@ public class Bomb extends AnimationTimer {
 			fireDirectionNotAllowed.clear();
 
 			firePositions.replaceAll((key, value) ->
-				switch (key) {
-					case UP -> value.add(0, -1);
-					case RIGHT -> value.add(1, 0);
-					case DOWN -> value.add(0, 1);
-					case LEFT -> value.add(-1, 0);
-					case NONE -> value;
-				}
+					switch (key) {
+						case UP -> value.add(0, -1);
+						case RIGHT -> value.add(1, 0);
+						case DOWN -> value.add(0, 1);
+						case LEFT -> value.add(-1, 0);
+						case NONE -> value;
+					}
 			);
 		}
 		isFire = true;
@@ -139,8 +162,8 @@ public class Bomb extends AnimationTimer {
 
 	private void endBoom() {
 		firePositions.forEach(position -> {
-			int row = (int)position.getY();
-			int col = (int)position.getX();
+			int row = (int) position.getY();
+			int col = (int) position.getX();
 			if (bomberModel.getCellValue(row, col) != CellValue.RIP) {
 				bomberModel.setCellValue(CellValue.EMPTY, row, col);
 			}
@@ -149,11 +172,16 @@ public class Bomb extends AnimationTimer {
 		this.stop();
 	}
 
+	/**
+	 * Sprawdza, czy gracz został pochłonięty przez bombę i jeżeli tak, to informuję o tym BomberModel
+	 *
+	 * @return true - ktoś z graczy został pochłonięty bombą, false - nie
+	 */
 	public boolean isHitPlayer() {
 		boolean isHitAnyone = bomberModel.getAlivePlayers().stream().anyMatch(player -> {
 			Point2D location = player.getPlayerLocation();
-			int row = (int)location.getY() / BomberView.CELL_SIZE;
-			int col = (int)location.getX() / BomberView.CELL_SIZE;
+			int row = (int) location.getY() / BomberView.CELL_SIZE;
+			int col = (int) location.getX() / BomberView.CELL_SIZE;
 			if (bomberModel.getCellValue(row, col) == CellValue.FIRE) {
 				bomberModel.setCellValue(CellValue.RIP, row, col);
 				hitPlayers.add(player);
@@ -168,15 +196,15 @@ public class Bomb extends AnimationTimer {
 
 	private void clearRIP() {
 		ripPositions.forEach(ripPosition -> {
-			int row = (int)ripPosition.getY() / BomberView.CELL_SIZE;
-			int col = (int)ripPosition.getX() / BomberView.CELL_SIZE;
+			int row = (int) ripPosition.getY() / BomberView.CELL_SIZE;
+			int col = (int) ripPosition.getX() / BomberView.CELL_SIZE;
 			bomberModel.setCellValue(CellValue.EMPTY, row, col);
 		});
 	}
 
 	private boolean isAnotherBombHit() {
-		int row = (int)location.getY() / BomberView.CELL_SIZE;
-		int col = (int)location.getX() / BomberView.CELL_SIZE;
+		int row = (int) location.getY() / BomberView.CELL_SIZE;
+		int col = (int) location.getX() / BomberView.CELL_SIZE;
 		return bomberModel.getCellValue(row, col) == CellValue.FIRE;
 	}
 }
