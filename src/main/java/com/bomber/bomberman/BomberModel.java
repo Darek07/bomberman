@@ -51,7 +51,7 @@ public class BomberModel {
 		}
 
 		columnCount = scanner.nextLine().length();
-		rowCount++;
+		rowCount = 1;
 		while (scanner.hasNextLine()) {
 			scanner.nextLine();
 			rowCount++;
@@ -117,6 +117,7 @@ public class BomberModel {
 		alivePlayers.addAll(ripPlayers);
 		ripPlayers.clear();
 		alivePlayers.forEach(Player::restoreInitialValues);
+		initializeMap(Controller.getMapFile());
 	}
 
 	/**
