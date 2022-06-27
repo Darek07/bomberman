@@ -70,9 +70,6 @@ public class Bomb extends AnimationTimer {
 		}, BOMB_FIRE_MS + BOMB_WAIT_MS);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void handle(long now) {
 		if (lastTime == 0) {

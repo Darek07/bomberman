@@ -322,7 +322,7 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
 	/**
 	 * Ustawia czas na jedną rundę przed rozpoczęciem gry
 	 *
-	 * @param roundTimeSec
+	 * @param roundTimeSec czas na jedną rundę
 	 */
 	public static void setRoundTimeSec(int roundTimeSec) {
 		Controller.roundTimeSec = roundTimeSec;

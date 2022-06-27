@@ -43,8 +43,8 @@ public class Bonus {
 	 * Sprawdza czy gracz wziął bonus i jeżeli tak, to poprawia jego charakterystyki, zgodnie z wziętym bonusem
 	 *
 	 * @param bomberModel BomberModel wykorzystywany w grze
-	 * @param player
-	 * @return
+	 * @param player gracz
+	 * @return true - gracz wziął bonus, inaczej false
 	 */
 	public static boolean isPlayerPickBonus(BomberModel bomberModel, Player player) {
 		Point2D playerLocation = player.getPlayerLocation();

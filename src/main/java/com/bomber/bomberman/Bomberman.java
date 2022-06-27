@@ -31,12 +31,6 @@ import java.net.URL;
  */
 public class Bomberman extends Application {
 
-	/**
-	 * Uruchomienie Javafx oraz okna startowego
-	 *
-	 * @param stage
-	 * @throws IOException
-	 */
 	@Override
 	public void start(Stage stage) throws IOException {
 		URL resource = getClass().getResource("bomberman_start.fxml");
@@ -51,11 +45,6 @@ public class Bomberman extends Application {
 		stage.show();
 	}
 
-	/**
-	 * Uruchomienie gry
-	 *
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		launch();
 	}

@@ -49,9 +49,6 @@ public class Player extends AnimationTimer {
 		start();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void handle(long now) {
 		if (lastUpdateTime == 0 || lastUpdateTime >= now) {
