@@ -17,7 +17,8 @@ public class Bonus {
 			CellValue.BOMB_BONUS,
 			CellValue.EMPTY,
 			CellValue.BOMB_BONUS,
-			CellValue.SPEED_BONUS };
+			CellValue.SPEED_BONUS
+	};
 
 	public static void randomBonus(BomberModel bomberModel, int row, int column) {
 		if (bomberModel.getCellValue(row, column) != CellValue.BREAKABLE_WALL) {

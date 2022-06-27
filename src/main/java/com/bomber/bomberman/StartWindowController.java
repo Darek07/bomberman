@@ -157,6 +157,8 @@ public class StartWindowController implements Initializable {
 		num1_button.setToggleGroup(toggleGroup);
 		num2_button.setToggleGroup(toggleGroup);
 		num3_button.setToggleGroup(toggleGroup);
+
+		num2_button.setSelected(true);
 	}
 
 	private void initializeMapSelection() {
@@ -164,6 +166,8 @@ public class StartWindowController implements Initializable {
 		map1.setOnAction(e -> choose_map.setText(map1.getText()));
 		map2.setOnAction(e -> choose_map.setText(map2.getText()));
 		map3.setOnAction(e -> choose_map.setText(map3.getText()));
+
+		choose_map.setText(map1.getText());
 	}
 
 	private int getPlayersNumber() {
