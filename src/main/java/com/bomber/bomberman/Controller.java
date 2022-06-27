@@ -62,9 +62,9 @@ public class Controller extends Thread implements EventHandler<KeyEvent>, Initia
 	 * Wykorzystywane w grze mapy
 	 */
 	public static final URL[] mapFiles = {
-			Controller.class.getResource("map.txt"),
-			Controller.class.getResource("map.txt"),
-			Controller.class.getResource("map.txt")};
+			Controller.class.getResource("map1.txt"),
+			Controller.class.getResource("map2.txt"),
+			Controller.class.getResource("map3.txt")};
 	/**
 	 * Klawisze dla pierwszego gracza
 	 */
