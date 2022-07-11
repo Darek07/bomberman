@@ -69,7 +69,7 @@
                      <graphic>
                         <ImageView fx:id="image_map1" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@map1.png" />
+                              <Image url="@img/map1.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -78,7 +78,7 @@
                      <graphic>
                         <ImageView fx:id="image_map2" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@map2.png" />
+                              <Image url="@img/map2.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -87,7 +87,7 @@
                      <graphic>
                         <ImageView fx:id="image_map3" fitHeight="50.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@map3.png" />
+                              <Image url="@img/map3.png" />
                            </image>
                         </ImageView>
                      </graphic>
